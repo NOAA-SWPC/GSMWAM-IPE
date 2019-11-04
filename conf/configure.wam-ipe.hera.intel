@@ -38,7 +38,7 @@ endif
 FC = mpiifort
 CC = mpiicc
 CXX = mpiicpc
-LD = mpiifort -mkl=sequential
+LD = mpiifort
 
 #########
 # flags #
