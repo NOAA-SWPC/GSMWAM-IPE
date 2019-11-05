@@ -1,0 +1,5 @@
+# Coupled WAM-IPE
+#
+## NEMS Application Builder file
+
+COMPONENTS=( IPE )
