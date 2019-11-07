@@ -83,7 +83,7 @@ CFLAGS := $(INCLUDE)
 
 FFLAGS := $(INCLUDE) -fno-alias -auto -safe-cray-ptr -save-temps -ftz -assume byterecl -nowarn -sox -align array64byte
 
-CPPDEFS += -DHAVE_NETCDF
+CPPFLAGS += -DHAVE_NETCDF
 
 ifeq ($(HYDRO),Y)
 CPPDEFS +=
