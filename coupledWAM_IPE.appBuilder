@@ -3,5 +3,3 @@
 ## NEMS Application Builder file
 
 COMPONENTS=( WAM IPE )
-
-NEMS_BUILDOPT="CPPFLAGS=-DBFB_REGRID"
