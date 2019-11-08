@@ -51,4 +51,4 @@ module load w3nco/2.0.7
 ## use pre-compiled EMSF library for above compiler / MPI combination
 ##
 module use -a /scratch1/NCEPDEV/nems/emc.nemspara/soft/modulefiles
-module load esmf/8.0.0bs48
+module load esmf/8.0.0
