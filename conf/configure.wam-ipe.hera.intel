@@ -83,7 +83,8 @@ CFLAGS := $(INCLUDE)
 
 FFLAGS := $(INCLUDE) -fno-alias -auto -safe-cray-ptr -save-temps -ftz -assume byterecl -nowarn -sox -align array64byte
 
-CPPFLAGS += -DHAVE_NETCDF
+# SWPC settings
+CPPFLAGS += -DHAVE_NETCDF -DBFB_REGRID
 
 ifeq ($(HYDRO),Y)
 CPPDEFS +=
