@@ -1,0 +1,45 @@
+e = e^2;
+TEC = TEC^2;
+nmf2 = nmf2^2;
+hmf2 = hmf2^2;
+tn = tn^2;
+vn_zonal = vn_zonal^2;
+vn_meridional = vn_meridional^2;
+vn_vertical = vn_vertical^2;
+O = O^2;
+N2 = N2^2;
+O2 = O2^2;
+
+e@rmsdiff = sqrt(e.avg());
+e@maxdiff = sqrt(e.max());
+
+TEC@rmsdiff = sqrt(TEC.avg());
+TEC@maxdiff = sqrt(TEC.max());
+
+nmf2@rmsdiff = sqrt(nmf2.avg());
+nmf2@maxdiff = sqrt(nmf2.max());
+
+hmf2@rmsdiff = sqrt(hmf2.avg());
+hmf2@maxdiff = sqrt(hmf2.max());
+
+tn@rmsdiff = sqrt(tn.avg());
+tn@maxdiff = sqrt(tn.max());
+
+vn_zonal@rmsdiff = sqrt(vn_zonal.avg());
+vn_zonal@maxdiff = sqrt(vn_zonal.max());
+
+vn_meridional@rmsdiff = sqrt(vn_meridional.avg());
+vn_meridional@maxdiff = sqrt(vn_meridional.max());
+
+vn_vertical@rmsdiff = sqrt(vn_vertical.avg());
+vn_vertical@maxdiff = sqrt(vn_vertical.max());
+
+O@rmsdiff = sqrt(O.avg());
+O@maxdiff = sqrt(O.max());
+
+O2@rmsdiff = sqrt(O2.avg());
+O2@maxdiff = sqrt(O2.max());
+
+N2@rmsdiff = sqrt(N2.avg());
+N2@maxdiff = sqrt(N2.max());
+
