@@ -1293,6 +1293,8 @@ if [ $IDEA = .true. ]; then
   ${NLN} $FIX_IDEA/global_idea* .
   # RT_WAM .nc files
   ${NLN} $FIX_IDEA/*.nc .
+  ${NLN} $IPE_IC_DIR/ionprof .
+  ${NLN} $IPE_IC_DIR/tiros_spectra .
 
   # IPE section
   if [ $IPE = .true. ]; then

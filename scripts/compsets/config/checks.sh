@@ -67,7 +67,7 @@ fi # NEMS loop
 # wam.config checks
 if [ $IDEA = .true. ] ; then
 	# WAM-specific directory checks
-	[[ $NEMS = .true. ]] && for var in FIX_IDEA GRIDSDIR RT_WAM DATADIR ; do
+	[[ $NEMS = .true. ]] && for var in FIX_IDEA GRIDSDIR DATADIR ; do
 		check_var $var
 	done
 
