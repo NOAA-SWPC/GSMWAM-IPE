@@ -399,8 +399,8 @@ if [[ $VERBOSE = YES ]] ; then
 fi
 #
 module purge
-module use -a $BASE_NEMS/src/conf
-module load modules.nems
+module use -a $BASEDIR/modulefiles/$BUILD_TARGET
+module load wam-ipe
 module list
 #
 export COMPLIANCECHECK=${COMPLIANCECHECK:-OFF}
@@ -1306,7 +1306,6 @@ if [ $IDEA = .true. ]; then
    ${NLN} $IPE_IC_DIR/wei96* ${DATA}
    ${NLN} $IPE_IC_DIR/*.dat ${DATA}
    ${NLN} $IPE_IC_DIR/*.bin ${DATA}
-   ${NLN} $IPE_IC_DIR/ ${DATA}
 
    # don't know what this is
    export FILE_IO_FORM="'grib' 'bin4' 'grib'"
