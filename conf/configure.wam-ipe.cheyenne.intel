@@ -35,10 +35,10 @@ endif
 ############
 # commands #
 ############
-FC = mpiifort
-CC = mpiicc
-CXX = mpiicpc
-LD = mpiifort
+FC = mpif90
+CC = mpicc
+CXX = mpicpc
+LD = mpif90
 
 #########
 # flags #
