@@ -1,7 +1,7 @@
 ## NEMS configuration file
 ##
-## Platform: Hera
-## Compiler: Intel with IntelMPI
+## Platform: Cheyenne
+## Compiler: Intel with SGI MPT
 
 SHELL=/bin/sh
 
@@ -35,10 +35,14 @@ endif
 ############
 # commands #
 ############
-FC = mpiifort
-CC = mpiicc
-CXX = mpiicpc
-LD = mpiifort
+SFC             =       ifort
+SCC             =       icc
+CCOMP           =       icc
+DM_FC           =       mpif90 -f90=$(SFC)
+DM_CC           =       mpicc -cc=$(SCC) -DMPI2_SUPPORT
+FC              =       $(DM_FC)
+CC              =       $(DM_CC) -DFSEEKO64_OK 
+LD              =       $(FC)
 
 #########
 # flags #
@@ -53,6 +57,7 @@ HYDRO = N
 CCPP = N
 TRANSITION = N
 STATIC = N
+SION = N
 
 include       $(ESMFMKFILE)
 ESMF_INC    = $(ESMF_F90COMPILEPATHS)
@@ -112,14 +117,11 @@ FFLAGS += -qno-opt-dynamic-align
 CFLAGS += -qno-opt-dynamic-align
 else
 ifeq ($(AVX2),Y)
-# Don't use the AVX512 flags yet on hera
-#FFLAGS += -axSSE4.2,AVX,CORE-AVX2,CORE-AVX512 -qno-opt-dynamic-align
-#CFLAGS += -axSSE4.2,AVX,CORE-AVX2,CORE-AVX512 -qno-opt-dynamic-align
 FFLAGS += -xCORE-AVX2 -qno-opt-dynamic-align
 CFLAGS += -xCORE-AVX2 -qno-opt-dynamic-align
 else
-FFLAGS += -qno-opt-dynamic-align
-CFLAGS += -qno-opt-dynamic-align
+FFLAGS += -xHOST -qno-opt-dynamic-align
+CFLAGS += -xHOST -qno-opt-dynamic-align
 endif
 endif
 
@@ -199,6 +201,12 @@ LDFLAGS += -L$(PATH_CCPP)/lib -lccpp
 endif
 endif
 
+ifeq ($(SION),Y)
+CPPDEFS += -DSION
+CFLAGS += $(SIONLIB_INC)
+FFLAGS += $(SIONLIB_INC)
+endif
+
 ifeq ($(TRANSITION),Y)
 CPPDEFS += -DTRANSITION
 endif
@@ -208,5 +216,5 @@ LDFLAGS += $(LIBS)
 ifdef InNemsMakefile
 FFLAGS += $(ESMF_INC)
 CPPFLAGS += -traditional
-EXTLIBS = $(NCEPLIBS) $(ESMF_LIB) $(LDFLAGS) $(NETCDF_LIB)
+EXTLIBS = $(NCEPLIBS) $(ESMF_LIB) $(LDFLAGS) $(NETCDF_LIB) $(SIONLIB_LIB)
 endif
