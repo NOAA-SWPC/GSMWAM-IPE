@@ -1293,6 +1293,9 @@ if [ $IDEA = .true. ]; then
   ${NLN} $FIX_IDEA/global_idea* .
   # RT_WAM .nc files
   ${NLN} $FIX_IDEA/*.nc .
+  # empirical poynting flux files
+  ${NLN} $FIX_IDEA/epf* .
+  # other fix files
   ${NLN} $IPE_IC_DIR/ionprof .
   ${NLN} $IPE_IC_DIR/tiros_spectra .
 
