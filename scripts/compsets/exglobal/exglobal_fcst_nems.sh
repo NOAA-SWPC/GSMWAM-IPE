@@ -1247,8 +1247,9 @@ if [ $NEMS = .true. ] ; then # grids for mediator
 fi
 
 if [ $IDEA = .true. ]; then
-  START_UT_SEC=$((10#$INI_HOUR*3600))
+  ${NLN} $COMOUT/wam_fields_${CDATE}_${cycle}.nc $DATA/wam_fields.nc
 
+  START_UT_SEC=$((10#$INI_HOUR*3600))
   if [ $INPUT_PARAMETERS = realtime ] ; then
     # copy in xml kp/f107
     XML_HOUR=`printf %02d $((10#$INI_HOUR / 3 * 3))` # 00 > 00, 01 > 00, 02 > 00, 03 > 03, etc.
