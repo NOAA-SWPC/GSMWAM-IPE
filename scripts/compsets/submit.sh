@@ -4,7 +4,7 @@ pwd=$(pwd)
 bn=$(basename $1)
 
 ## set restart
-cycle=${2:-1}
+export cycle=${2:-1}
 if [[ $cycle == 1 ]] ; then
   export RESTART=.false.
 else
