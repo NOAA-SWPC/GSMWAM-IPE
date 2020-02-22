@@ -1,0 +1,200 @@
+
+# General Plot settings to be applied to 
+plot_settings:
+
+  font_family        : serif
+  font_size          : 16
+  title_font_size    : 20
+  contour_line_width : 1
+  contour_line_color : black
+
+plots:
+ 
+# Each plot type should have the following attributes defined 
+#
+# title 
+#   Type : string
+#   Description : The title of the plot. This plot title will be added to the top-center
+#                 of the plot and will be accompanied by the timestamp obtained from the
+#                 netcdf file.
+# type
+#   Type : string array
+#   Valid values: ["polar"] ["mercator"] ["mercator", "polar"], ["polar", "mercator"]
+#   Description : An array indicating the types of plots to make. Currently, northern
+#                 hemisphere polar plots and mercator projections are allowed.
+#    
+#
+# netcdf_name
+#   Type : string
+#   Description : Name of the variable inside the NetCDF file containing model data
+#
+# netcdf_prefix
+#   Type : string
+#   Description : Prefix of the NetCDF files containing model output. For Example,
+#                 setting this to IPE_State will cause the provided python plotting
+#                 code to search for files IPE_State.*.nc in the model output directory
+#                 to generate the list of files to plot 
+#
+# altitude
+#   Type : integer
+#   Description : For 3-D variables, the altitude to slice the 3-D variable. Set to 0, if the
+#                 field is a 2-D variable. 
+#
+# <attribute>
+#   Type : < string, boolean, integer >
+#   Description : 
+#
+
+  - plot :
+      title         : "Neutral Temperature at 350 km"
+      save_name     : ipe_neutral_temperature
+      type          : ["mercator", "polar"]
+      netcdf_name   : temperature
+      netcdf_prefix : IPE_State
+      altitude      : 350
+      n_colors      : 20
+      n_contours    : 0
+      minimum       : 900
+      maximum       : 1400
+      color_map     : Reds
+      n_ticks       : 11
+      units         : "K"
+
+
+  - plot :
+      title         : "Neutral Temperature at 350 km"
+      save_name     : ipe_neutral_temperature
+      type          : ["mercator", "polar"]
+      netcdf_name   : temperature
+      netcdf_prefix : IPE_State
+      altitude      : 350
+      n_colors      : 20
+      n_contours    : 0
+      minimum       : 900
+      maximum       : 1400
+      color_map     : Reds
+      n_ticks       : 11
+      units         : "K"
+
+  - plot :
+      title         : "Oxygen at 350 km"
+      save_name     : ipe_oxygen
+      type          : ["mercator", "polar"]
+      netcdf_name   : oxygen
+      netcdf_prefix : IPE_State
+      altitude      : 350
+      n_colors      : 20
+      n_contours    : 0
+      minimum       : 3.2e+14
+      maximum       : 6.0e+14
+      color_map     : Reds
+      n_ticks       : 11
+      units         : "m^{-3}"
+
+  - plot :
+      title         : "Molecular Nitrogen at 350 km"
+      save_name     : ipe_molecular_nitrogen
+      type          : ["mercator", "polar"]
+      netcdf_name   : molecular_nitrogen
+      netcdf_prefix : IPE_State
+      altitude      : 350
+      n_colors      : 20
+      n_contours    : 0
+      minimum       : 0.4e+14
+      maximum       : 1.8e+14
+      color_map     : Reds
+      n_ticks       : 11
+      units         : "m^{-3}"
+
+  - plot :
+      title         : "Helium at 350 km"
+      save_name     : ipe_helium
+      type          : ["mercator", "polar"]
+      netcdf_name   : helium
+      netcdf_prefix : IPE_State
+      altitude      : 350
+      n_colors      : 20
+      n_contours    : 0
+      minimum       : 0.0e+0
+      maximum       : 0.0e+0
+      color_map     : Reds
+      n_ticks       : 11
+      units         : "m^{-3}"
+
+  - plot :
+      title         : "Zonal Wind at 350 km"
+      save_name     : ipe_zonal_wind
+      type          : ["mercator", "polar"]
+      netcdf_name   : u
+      netcdf_prefix : IPE_State
+      altitude      : 350
+      n_colors      : 20
+      n_contours    : 0
+      minimum       : -4.0e+2
+      maximum       : 4.0e+2
+      color_map     : coolwarm
+      n_ticks       : 11
+      units         : "m/s"
+
+  - plot :
+      title         : "Meridional Wind at 350 km"
+      save_name     : ipe_meridional_wind
+      type          : ["mercator", "polar"]
+      netcdf_name   : v
+      netcdf_prefix : IPE_State
+      altitude      : 350
+      n_colors      : 20
+      n_contours    : 0
+      minimum       : -4.0e+2
+      maximum       : 4.0e+2
+      color_map     : coolwarm
+      n_ticks       : 11
+      units         : "m/s"
+
+  - plot :
+      title         : "Vertical Wind at 350 km"
+      save_name     : ipe_vertical_wind
+      type          : ["mercator", "polar"]
+      netcdf_name   : w
+      netcdf_prefix : IPE_State
+      altitude      : 350
+      n_colors      : 20
+      n_contours    : 0
+      minimum       : -1.0e+1
+      maximum       : 1.0e+1
+      color_map     : coolwarm
+      n_ticks       : 11
+      units         : "m/s"
+
+  - plot :
+      title         : "O+ at 350 km"
+      save_name     : ipe_o_plus
+      type          : ["mercator", "polar"]
+      netcdf_name   : O+
+      netcdf_prefix : IPE_State
+      altitude      : 350
+      n_colors      : 20
+      n_contours    : 0
+      minimum       : 0
+      maximum       : 0
+      color_map     : Reds
+      n_ticks       : 11
+      units         : ""
+
+
+  - plot :
+      title         : TEC
+      save_name     : TEC
+      type          : ["mercator", "polar"]
+      netcdf_name   : tec
+      netcdf_prefix : IPE_State
+      altitude      : 0
+      n_colors      : 200
+      n_contours    : 10
+      minimum       : 20
+      maximum       : 100
+      color_map     : Reds
+      n_ticks       : 11
+      units         : TECu
+   
+  

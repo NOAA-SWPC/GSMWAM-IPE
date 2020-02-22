@@ -8,3 +8,7 @@
 	path = NEMS
 	url = https://github.com/SWPC-IPE/NEMS.git
 	branch = develop
+[submodule "SWIO"]
+	path = SWIO
+	url = https://github.com/NOAA-SWPC/SWIO.git
+	branch = master
