@@ -19,7 +19,7 @@ module-whatis "loads NEMS GSMWAM-IPE prerequisites on Venus and Mars"
 module load ips/18.0.1.163
 module load impi/18.0.1
 module load NetCDF/4.5.0
-module use /gpfs/hps3/emc/global/noscrub/Adam.Kubaryk/modulefiles
+module use /gpfs/dell2/swpc/noscrub/Adam.Kubaryk/modulefiles
 module load HDF5-parallel/1.10.1
 module load cmake/3.10.0
 module load lsf/10.1
