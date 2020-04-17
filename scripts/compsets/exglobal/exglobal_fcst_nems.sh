@@ -1438,8 +1438,9 @@ runSeq::
     @$coupling_interval_fast_sec
       ATM
     @
-    ATM -> AIO
     IPM
+    AIO
+    ATM -> AIO
     IO
     IPM -> IO
   @
@@ -1448,7 +1449,7 @@ EOF
 
 cat << EOF > $DATA/med.rc
 #############################################
-####  SWIO Mediator Configuration File  #####
+####  SWPC Mediator Configuration File  #####
 #############################################
 
 mesh_file_prefix:  med
