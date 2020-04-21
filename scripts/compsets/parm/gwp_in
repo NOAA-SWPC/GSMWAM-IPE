@@ -1,0 +1,17 @@
+&gw_parms_nl
+ ispectra_type=1, sp_width=30.0
+ nazim_ngw=4, nazim_ogw=4, nazim_cgw=4
+ ngw_par_type = 1,  pmb_ngw = 600.0,   nw_ngw = 4, cmax_ngw = 75.0, dc_ngw = 3.75
+ ogw_par_type = 1,  pmb_ogw = 1000.0,  Nw_ogw = 1, cmax_ogw = 0.0, dc_ogw = .0
+ cgw0_par_type = 0, pmb_cgw = 700.0,   Nw_cgw = 1, cmax_cgw = 0.0, dc_cgw = .0
+ relf_par_type = 1, pmb_rfric = 0.25,  rel_max = 5.0, rel_expkm = 5.0
+ eff_ogw =0.125, eff_cgw=0.30
+ gw_src_file = 'wam_nems_gw_sources.nc'
+ gw_dis_file = 'wam_nems_gw_dissip.nc'
+ Dir_swpc = './'
+ Dir_uid =  './'
+ igw_effects = 1, 1, 1
+ eff_ngw = 0.1
+ GWP_SOLVER = 'LINDZEN_LSATVY'
+ IMPL_UNIF_GW = 'WAM150L'
+/

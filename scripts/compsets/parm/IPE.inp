@@ -1,0 +1,39 @@
+&SPACEMANAGEMENT
+ GRID_FILE = '$IPEGRIDFILENAME',
+ NLP              = 170,
+ NMP              = 80,
+ NPTS2D           = 44514,
+ NFLUXTUBE        = 1115
+/
+&TIMESTEPPING
+ TIME_STEP   = ${DELTIM_IPE}D0,
+ START_TIME  = ${START_UT_SEC}.0D0,
+ END_TIME    = $((IPEFMAX+$START_UT_SEC)).0D0,
+ MSIS_TIME_STEP   = ${MSIS_TIME_STEP:-900}.D0,
+ INITIAL_TIMESTAMP = ${CIPEDATE}
+/
+&FORCING
+ SOLAR_FORCING_TIME_STEP = ${F107_KP_INTERVAL}.0D0,
+ F107_KP_SIZE            = ${F107_KP_SIZE},
+ F107_KP_INTERVAL        = ${F107_KP_INTERVAL},
+ F107_KP_SKIP_SIZE       = ${F107_KP_SKIP_SIZE},
+ F107_KP_DATA_SIZE       = ${F107_KP_DATA_SIZE},
+ F107_KP_READ_IN_START   = ${F107_KP_READ_IN_START:-0},
+ F107_KP_FILE            = './wam_input_f107_kp.txt'
+/
+&FILEIO
+ READ_APEX_NEUTRALS        = ${READ_APEX_NEUTRALS:-"T"},
+ WRITE_APEX_NEUTRALS       = T,
+ WRITE_GEOGRAPHIC_NEUTRALS = T,
+ FILE_OUTPUT_FREQUENCY     = ${IPEFREQ}.0D0
+/
+&ipecap
+  mesh_height_min = 0.
+  mesh_height_max = 782.
+  mesh_write      = 0
+  mesh_write_file = 'ipemesh'
+  mesh_fill       = ${mesh_fill:-"1"}
+/
+&ELDYN
+  DYNAMO_EFIELD          = ${DYNAMO_EFIELD:-"T"}
+/

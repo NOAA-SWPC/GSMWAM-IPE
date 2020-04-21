@@ -1,0 +1,9 @@
+&ion_parms_nl
+ GW_fix=30., tiros_activity_fix=7, idea_imf_fix=1
+ tiros_file  = 'tiros_tjr.nc'
+ dation_file = 'iondata_tjr.nc'
+ imf_file='wam_nems_imf_2012.nc'
+ Dir_swpc = './'
+ Dir_uid =  './'
+ Dir_imf = './'
+/

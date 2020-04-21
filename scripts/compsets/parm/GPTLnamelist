@@ -1,0 +1,5 @@
+&gptlnl
+ print_method = 'full_tree' ! print full call tree	
+ utr          = 'nanotime'  ! fastest available underlying timer (Intel processors only)	
+! eventlist   = 'PAPI_FP_OPS','GPTL_CI' ! PAPI-based counters (only if PAPI is available)	
+/

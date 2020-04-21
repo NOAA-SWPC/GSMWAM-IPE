@@ -3,6 +3,7 @@
 export SCRIPTSDIR=`pwd`/..
 export COMPSETDIR=`pwd`
 export CONFIGDIR=`pwd`/config
+export PARMDIR=`pwd`/parm
 
 # run detect_machine, will exit if machine is unknown or config file doesn't exist for machine
 . $CONFIGDIR/detect_machine.sh
@@ -48,6 +49,8 @@ fi
 else # standalone
 . $CONFIGDIR/wam_dpnamelist.config
 fi
+
+. $CONFIGDIR/swio.config
 
 # run our checks to make sure we're not walking into any walls before we try to run a job
 . $CONFIGDIR/checks.sh

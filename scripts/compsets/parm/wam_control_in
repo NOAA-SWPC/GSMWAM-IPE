@@ -1,0 +1,8 @@
+&nam_wam_control
+     wam_climate=.false., wam_swpc_3day=.true., wam_cires_rdata=.false.,
+     wam_swin = .true.,
+     wam_smin=.false., wam_smax=.false., wam_saver=.true., wam_geostorm=.false.,
+     wam_gwphys=.false., wam_solar_in=.false., wam_ion_in=.false.
+     wam_das_in=.false., wam_smet_in=.false., wam_netcdf_inout=.true.
+     wam_tides_diag=.false., wam_pws_diag=.false., wam_gws_diag=.false.
+/

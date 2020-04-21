@@ -1,0 +1,58 @@
+#############################################
+####  NEMS Run-Time Configuration File  #####
+#############################################
+# EARTH #
+EARTH_component_list: MED ATM IPM AIO IO
+EARTH_attributes::
+  Verbosity = max
+::
+# MED #
+MED_model:                      $med_model
+MED_petlist_bounds:             $med_petlist_bounds
+MED_attributes::
+  Verbosity = max
+  DumpFields = false
+  DumpRHs = false
+::
+# ATM #
+ATM_model:                      wam
+ATM_petlist_bounds:             $atm_petlist_bounds
+ATM_attributes::
+  Verbosity = max
+::
+# IPM #
+IPM_model:                      ipe
+IPM_petlist_bounds:             $ipm_petlist_bounds
+IPM_attributes::
+  Verbosity = max
+::
+# AIO #
+AIO_model:                      swio
+AIO_petlist_bounds:             $atm_petlist_bounds
+AIO_attributes::
+  Verbosity = max
+  ConfigFile = swio.wam.rc
+::
+# IO #
+IO_model:                       swio
+IO_petlist_bounds:              $ipm_petlist_bounds
+IO_attributes::
+  Verbosity = max
+  ConfigFile = swio.ipe.rc
+::
+# Run Sequence #
+runSeq::
+  @$coupling_interval_slow_sec
+    ATM -> MED :remapMethod=redist
+    MED
+    MED -> IPM :remapMethod=redist
+    @$coupling_interval_fast_sec
+      ATM
+    @
+    IPM
+    AIO
+    ATM -> AIO
+    IO
+    IPM -> IO
+  @
+::
