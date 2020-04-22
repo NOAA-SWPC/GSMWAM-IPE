@@ -1,0 +1,5 @@
+# Coupled WAM-IPE with SWIO
+#
+## NEMS Application Builder file
+
+COMPONENTS=( WAM IPE SWIO )

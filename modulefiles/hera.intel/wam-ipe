@@ -53,3 +53,17 @@ module load szip/2.1
 ##
 module use -a /scratch1/NCEPDEV/nems/emc.nemspara/soft/modulefiles
 module load esmf/8.0.0
+
+##
+## load modules for SWIO
+##
+module load szip/2.1
+
+module use -a /scratch1/NCEPDEV/swpc/Raffaele.Montuoro/swpc.spacepara/modulefiles
+module load pnetcdf/1.12.1
+module load comio/0.0.1
+
+##
+## use workaround to prevent possible runtime failures with Intel MPI
+##
+setenv I_MPI_ADJUST_ALLTOALLV 0

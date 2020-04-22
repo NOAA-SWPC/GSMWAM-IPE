@@ -1385,7 +1385,7 @@ cat << EOF > $DATA/nems.configure
 #############################################
 
 # EARTH #
-EARTH_component_list: MED ATM IPM
+EARTH_component_list: MED ATM IPM AIO IO
 EARTH_attributes::
   Verbosity = max
 ::
@@ -1413,6 +1413,22 @@ IPM_attributes::
   Verbosity = max
 ::
 
+# AIO #
+AIO_model:                      swio
+AIO_petlist_bounds:             $atm_petlist_bounds
+AIO_attributes::
+  Verbosity = max
+  ConfigFile = swio.wam.rc
+::
+
+# IO #
+IO_model:                       swio
+IO_petlist_bounds:              $ipm_petlist_bounds
+IO_attributes::
+  Verbosity = max
+  ConfigFile = swio.ipe.rc
+::
+
 # Run Sequence #
 runSeq::
   @$coupling_interval_slow_sec
@@ -1423,10 +1439,335 @@ runSeq::
       ATM
     @
     IPM
+    AIO
+    ATM -> AIO
+    IO
+    IPM -> IO
   @
 ::
 EOF
 
+cat << EOF > $DATA/med.rc
+#############################################
+####  SWPC Mediator Configuration File  #####
+#############################################
+
+mesh_file_prefix:  med
+mesh_write: false
+
+interpolation_levels::
+89.81
+91.25
+92.68
+94.11
+95.54
+96.97
+98.41
+99.86
+101.33
+102.83
+104.38
+105.99
+107.66
+109.44
+111.33
+113.36
+115.61
+118.11
+120.92
+124.09
+127.6
+131.47
+135.68
+140.25
+145.17
+150.44
+156.05
+161.98
+168.24
+174.8
+181.66
+188.81
+196.24
+203.93
+211.9
+220.13
+228.61
+237.34
+246.32
+255.54
+265.
+274.69
+284.6
+294.72
+305.04
+315.56
+326.27
+337.22
+348.31
+359.6
+371.08
+382.77
+394.69
+406.85
+418.
+430.
+440.
+450.
+460.
+470.
+480.
+490.
+500.
+510.
+520.
+530.
+540.
+550.
+560.
+570.
+580.
+590.
+600.
+610.
+620.
+630.
+640.
+650.
+660.
+670.
+680.
+690.
+700.
+710.
+720.
+730.
+740.
+750.
+760.
+770.
+780.
+790.
+800.
+::
+EOF
+
+cat << EOF > $DATA/swio.wam.rc
+#############################################
+####  SWIO Run-Time Configuration File  #####
+#############################################
+#
+#  Imported fields
+#
+import_fields::
+    height
+    temp_neutral
+    eastward_wind_neutral
+    northward_wind_neutral
+    upward_wind_neutral
+    O_Density
+    O2_Density
+    N2_Density
+::
+
+#
+# Output file format.
+#
+# Choose from:
+# - hdf5
+# - pnetcdf or parallel-netcdf
+#
+output_format: pnetcdf
+
+#
+# Output file prefix.
+#
+# Output file names are created as:
+#   <prefix>.<datetime>.<suffix>
+# where:
+#   <prefix>   : is the string provided via
+#                output_file_prefix keyword
+#   <datetime> : inported field timestamp,
+#                formatted as: YYYYMMDD_hhmmss
+#   <suffix>   : determined from output format:
+#                'hd5' for hdf5, 'nc' for pnetcdf
+#
+output_file_prefix: gsm
+
+#
+# Output grid type.
+#
+# Supported types are:
+# - latlon: 2D/3D regular lat/lon spherical grid
+# - none  : native (imported) grid/mesh
+#
+output_grid_type: latlon
+
+#
+# The following keywords are read only if grid
+# type is 'latlon'
+#
+# Output grid size.
+#
+# Provides the lat/lon grid resolution as
+#   #longitudes #latitudes [#levels]
+#
+# If #levels is missing, a 2D lat/lon grid will be built
+#
+# If #levels > 0, the minimum and maximum value of the
+# vertical coordinate (km) will be read via the
+# 'output_grid_level_range' keyword below.
+#
+# If #levels = 0, the grid's vertical levels are read
+# from the 'output_grid_level_values' table (km)
+#
+# If #levels < 0, ungridded #nlevels will be added
+#
+output_grid_size: 90 91 -150
+
+#
+# Minimin and maximum values of vertical coordinate (km)
+# Used if #levels > 0
+#
+output_grid_level_range: 90. 1000.
+
+#
+# List of vertical levels (km)
+# Used if #levels = 0
+#
+output_grid_level_values::
+   90.
+  150.
+  300.
+  400.
+  500.
+  600.
+  700.
+  800.
+::
+
+#
+# If true, this flag transforms the vertical coordinate (v),
+# assumed in km, to heights (h) relative to the average
+# Earth's radius (R=6,371.2 km), accordina to the formula:
+#   h = 1 + v/R
+#
+output_grid_level_relative: false
+EOF
+
+cat << EOF > $DATA/swio.ipe.rc
+#############################################
+####  SWIO Run-Time Configuration File  #####
+#############################################
+#
+#  Imported fields
+#
+import_fields::
+    temp_neutral
+    eastward_wind_neutral
+    northward_wind_neutral
+    upward_wind_neutral
+    O_Density
+    O2_Density
+    N2_Density
+    O_plus_density
+    H_plus_density
+    He_plus_density
+    N_plus_density
+    NO_plus_density
+    O2_plus_density
+    N2_plus_density
+    O_plus_2D_density
+    O_plus_2P_density
+    ion_temperature
+    electron_temperature
+    eastward_exb_velocity
+    northward_exb_velocity
+    upward_exb_velocity
+::
+
+#
+# Output file format.
+#
+# Choose from:
+# - hdf5
+# - pnetcdf or parallel-netcdf
+#
+output_format: pnetcdf
+
+#
+# Output file prefix.
+#
+# Output file names are created as:
+#   <prefix>.<datetime>.<suffix>
+# where:
+#   <prefix>   : is the string provided via
+#                output_file_prefix keyword
+#   <datetime> : inported field timestamp,
+#                formatted as: YYYYMMDD_hhmmss
+#   <suffix>   : determined from output format:
+#                'hd5' for hdf5, 'nc' for pnetcdf
+#
+output_file_prefix: ipe
+
+#
+# Output grid type.
+# 
+# Supported types are:
+# - latlon: 2D/3D regular lat/lon spherical grid
+# - none  : native (imported) grid/mesh
+#
+output_grid_type: latlon
+
+#
+# The following keywords are read only if grid
+# type is 'latlon'
+#
+# Output grid size.
+#
+# Provides the lat/lon grid resolution as
+#   #longitudes #latitudes [#levels]
+
+# If #levels is missing, a 2D lat/lon grid will be built
+#
+# If #levels > 0, the minimum and maximum value of the
+# vertical coordinate (km) will be read via the 
+# 'output_grid_level_range' keyword below.
+#
+# IF #levels <=0, the grid's vertical levels are read
+# from the 'output_grid_level_values' table (km)
+#
+output_grid_size: 90 91 183
+
+#
+# Minimin and maximum values of vertical coordinate (km)
+# Used if #levels > 0
+#
+output_grid_level_range: 90. 1000.
+
+#
+# List of vertical levels (km)
+# Used if #levels <= 0
+#
+output_grid_level_values::
+   90.
+  150.
+  300.
+  400.
+  500.
+  600.
+  700.
+  800.
+::
+
+#
+# If true, this flag transforms the vertical coordinate (v),
+# assumed in km, to heights (h) relative to the average
+# Earth's radius (R=6,371.2 km), accordina to the formula:
+#   h = 1 + v/R
+#
+output_grid_level_relative: false
+EOF
 
 else
 
