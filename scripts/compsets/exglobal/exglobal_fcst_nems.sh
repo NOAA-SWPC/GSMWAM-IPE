@@ -1038,7 +1038,7 @@ while [[ $NEMS = .true. ]] && [[ 10#$FH -le $FHMAX ]] ; do
 done
 # IPE
 if [[ $IPE = .true. ]] ; then
-  CIPEDATE=${CIPEDATE:-$CDATE${IPEMINUTES:-00}}
+  export CIPEDATE=${CIPEDATE:-$CDATE${IPEMINUTES:-00}}
   STEPS=$(((10#$FHMAX-10#$FHINI)*60*60/IPEFREQ))
   STEP=1
   while [[ $STEP -le $STEPS ]] ; do
@@ -1048,16 +1048,18 @@ if [[ $IPE = .true. ]] ; then
   done
 fi
 if [[ $SWIO = .true. ]] ; then
-  for model in "${SWIO_MODELS[@]}"; do
-    eval prefix=\$${model}_PREFIX
-    eval cadence=\$${model}_CADENCE
-    STEPS=$(((10#$FHMAX-10#$FHINI)*60*60/cadence))
-    STEP=1
-    while [[ -n "$prefix" -a -n "$cadence" -a $STEP -le $STEPS ]] ; do
-      TIMESTAMP=`$MDATE $((STEP*IPEFREQ/60)) $FDATE`
-      $NLN ${COMOUT}/${prefix}.${TIMESTAMP}.nc
-      STEP=$((STEP+1))
-    done
+  for iomodel in $SWIO_MODELS; do
+    eval prefix=\$${iomodel}_PREFIX
+    eval cadence=\$${iomodel}_CADENCE
+    if [[ -n "$cadence" ]] ; then
+      STEPS=$(((10#$FHMAX-10#$FHINI)*60*60/cadence))
+      STEP=1
+      while [ $STEP -le $STEPS ] ; do
+        TIMESTAMP=`$MDATE $((STEP*cadence/60)) ${FDATE}00`
+        $NLN ${COMOUT}/${prefix}.${TIMESTAMP}.nc ${DATA}/.
+        STEP=$((STEP+1))
+      done
+    fi
   done
 fi
 eval ln -fs $FORT1051 fort.1051
@@ -1086,10 +1088,10 @@ INI_MONTH=$(echo $FDATE  | cut -c5-6)
 INI_DAY=$(echo $FDATE    | cut -c7-8)
 INI_HOUR=$(echo $FDATE   | cut -c9-10)
 
-C_YEAR=$(echo $CDATE     | cut -c1-4)
-C_MONTH=$(echo $CDATE    | cut -c5-6)
-C_DAY=$(echo $CDATE      | cut -c7-8)
-C_HOUR=$(echo $CDATE     | cut -c9-10)
+export C_YEAR=$(echo $CDATE     | cut -c1-4)
+export C_MONTH=$(echo $CDATE    | cut -c5-6)
+export C_DAY=$(echo $CDATE      | cut -c7-8)
+export C_HOUR=$(echo $CDATE     | cut -c9-10)
 
 ## copy configure files needed for NEMS GFS
 ${NCP} ${MAPL:-$PARM_NGAC/MAPL.rc}                    MAPL.rc
@@ -1110,17 +1112,16 @@ if [ $GOCART == 1 ] ; then
  ln -sf $FIX_NGAC  ngac_fix
 fi
 # below seem unnecessary
-  if [ $DOIAU = YES ]; then
+if [ $DOIAU = YES ]; then
+  export RESTART=.false.
 
-     export RESTART=.false.
+  export FHRES=3
+  export FHOUT=1
+  export FHZER=3
 
-     export FHRES=3
-     export FHOUT=1
-     export FHZER=3
+  export IAU=.true.
 
-     export IAU=.true.
-
-  fi
+fi
 
 
 # Mostly IDEA-related stuff in this section
@@ -1128,7 +1129,9 @@ fi
 if [ $IDEA = .true. ]; then
   ${NLN} $COMOUT/wam_fields_${CDATE}_${cycle}.nc $DATA/wam_fields.nc
 
-  START_UT_SEC=$((10#$INI_HOUR*3600))
+  export START_UT_SEC=$((10#$INI_HOUR*3600))
+  export END_TIME=$((IPEFMAX+$START_UT_SEC))
+  export MSIS_TIME_STEP=${MSIS_TIME_STEP:-900}
   if [ $INPUT_PARAMETERS = realtime ] ; then
     # copy in xml kp/f107
     XML_HOUR=`printf %02d $((10#$INI_HOUR / 3 * 3))` # 00 > 00, 01 > 00, 02 > 00, 03 > 03, etc.
@@ -1169,6 +1172,8 @@ if [ $IDEA = .true. ]; then
   F107_KP_INTERVAL=60
   F107_KP_SKIP_SIZE=$((36*60*60/$F107_KP_INTERVAL))
   [[ $NEMS = .true. ]] && F107_KP_READ_IN_START=$((FHINI*60*60/$F107_KP_INTERVAL))
+  export F107_KP_READ_IN_START=${F107_KP_READ_IN_START:-0}
+  export f107_kp_size=$((F107_KP_SIZE+$FHINI*60*60/$F107_KP_INTERVAL))
   # global_idea fix files
   ${NLN} $FIX_IDEA/global_idea* .
   # RT_WAM .nc files
@@ -1178,24 +1183,27 @@ if [ $IDEA = .true. ]; then
 
   # IPE section
   if [ $IPE = .true. ]; then
-   [[ $NEMS = .false. ]] && READ_APEX_NEUTRALS="F"
+    [[ $NEMS = .false. ]] && export READ_APEX_NEUTRALS="F"
+    export READ_APEX_NEUTRALS=${READ_APEX_NEUTRALS:-"T"}
+    export mesh_fill=${mesh_fill:-"1"}
+    export DYNAMO_EFIELD=${DYNAMO_EFIELD:-"T"}
 
-   # IPE fix files
-   #${NLN} $BASE_NEMS/../IPELIB/run/coeff* ${DATA}
-   $NLN $IPEGRID ${DATA}/$IPEGRIDFILENAME
-   ${NLN} $IPE_IC_DIR/wei96* ${DATA}
-   ${NLN} $IPE_IC_DIR/*.dat ${DATA}
-   ${NLN} $IPE_IC_DIR/*.bin ${DATA}
+    # IPE fix files
+    #${NLN} $BASE_NEMS/../IPELIB/run/coeff* ${DATA}
+    $NLN $IPEGRID ${DATA}/$IPEGRIDFILENAME
+    ${NLN} $IPE_IC_DIR/wei96* ${DATA}
+    ${NLN} $IPE_IC_DIR/*.dat ${DATA}
+    ${NLN} $IPE_IC_DIR/*.bin ${DATA}
 
-   # don't know what this is
-   export FILE_IO_FORM="'grib' 'bin4' 'grib'"
+    # don't know what this is
+    export FILE_IO_FORM="'grib' 'bin4' 'grib'"
 
-   # used for ipe namelist
-   export DOY=`date -d ${INI_MONTH}/${INI_DAY}/${INI_YEAR} +%j`
+    # used for ipe namelist
+    export DOY=`date -d ${INI_MONTH}/${INI_DAY}/${INI_YEAR} +%j`
 
 
-   $NLN $PARMDIR/GPTLnamelist .
-   envsubst < $PARMDIR/IPE.inp > IPE.inp
+    $NLN $PARMDIR/GPTLnamelist .
+    envsubst < $PARMDIR/IPE.inp > IPE.inp
 
   fi # IPE
 
@@ -1203,80 +1211,94 @@ fi # IDEA
 
 if [[ $WAM_IPE_COUPLING = .true. ]] ; then
   if [[ $SWIO = .true. ]] ; then
-    $NLN $PARMDIR/nems.configure.wi_io $DATA/nems.configure
+    envsubst < $PARMDIR/nems.configure.WAM-IPE_io       > $DATA/nems.configure
   else
-    $NLN $PARMDIR/nems.configure.wi    $DATA/nems.configure
+    envsubst < $PARMDIR/nems.configure.WAM-IPE          > $DATA/nems.configure
+  fi
 else # standaloneWAM
   if [[ $SWIO = .true. ]] ; then
-    $NLN $PARMDIR/nems.configure.sw_io $DATA/nems.configure
+    envsubst < $PARMDIR/nems.configure.standaloneWAM_io > $DATA/nems.configure
   else
-    $NLN $PARMDIR/nems.configure.sw    $DATA/nems.configure
+    envsubst < $PARMDIR/nems.configure.standaloneWAM    > $DATA/nems.configure
   fi
 fi
 
-core=${core:-gfs}
-coupling_interval_fast_sec=${coupling_interval_fast_sec-""}
+if [[ $NEMS = .true. ]] ; then
+  export dyncore=${dyncore:-gfs}
+  export atm_model=${atm_model:-gsm}
+  export coupling_interval_fast_sec=${coupling_interval_fast_sec:-""}
+  export liope=${liope:-".false."}
 
-envsubst < $PARMDIR/atmos.configure > atmos.configure
+  $NLN $PARMDIR/med.rc .
 
-# addition import/export variables for stochastic physics
-export sppt_import=${sppt_import:-0}
-export sppt_export=${sppt_export:-0}
-export shum_import=${shum_import:-0}
-export shum_export=${shum_export:-0}
-export skeb_import=${skeb_import:-0}
-export skeb_export=${skeb_export:-0}
-export vc_import=${vc_import:-0}
-export vc_export=${vc_export:-0}
+  envsubst < $PARMDIR/atmos.configure > atmos.configure
 
-cat atm_namelist.rc > dyn_namelist.rc
-envsubst < $PARMDIR/dyn_namelist.rc >> dyn_namelist.rc
+  envsubst < $PARMDIR/atm_namelist.rc > atm_namelist.rc
 
-cat atm_namelist.rc > phy_namelist.rc
-envsubst < $PARMDIR/phy_namelist.rc >> phy_namelist.rc
+  # addition import/export variables for stochastic physics
+  export sppt_import=${sppt_import:-0}
+  export sppt_export=${sppt_export:-0}
+  export shum_import=${shum_import:-0}
+  export shum_export=${shum_export:-0}
+  export skeb_import=${skeb_import:-0}
+  export skeb_export=${skeb_export:-0}
+  export vc_import=${vc_import:-0}
+  export vc_export=${vc_export:-0}
 
-# additional namelist parameters for stochastic physics.  Default is off
-export SPPT=${SPPT:-"0.0,0.0,0.0,0.0,0.0"}
-export ISEED_SPPT=${ISEED_SPPT:-0}
-export SPPT_LOGIT=${SPPT_LOGIT:-.TRUE.}
-export SPPT_TAU=${SPPT_TAU:-"21600,2592500,25925000,7776000,31536000"}
-export SPPT_LSCALE=${SPPT_LSCALE:-"500000,1000000,2000000,2000000,2000000"}
+  cat atm_namelist.rc > dyn_namelist.rc
+  envsubst < $PARMDIR/dyn_namelist.rc >> dyn_namelist.rc
 
-export SHUM=${SHUM:-"0.0, -999., -999., -999, -999"}
-export ISEED_SHUM=${ISEED_SHUM:-0}
-export SHUM_TAU=${SHUM_TAU:-"2.16E4, 1.728E5, 6.912E5, 7.776E6, 3.1536E7"}
-export SHUM_LSCALE=${SHUM_LSCALE:-"500.E3, 1000.E3, 2000.E3, 2000.E3, 2000.E3"}
+  cat atm_namelist.rc > phy_namelist.rc
+  envsubst < $PARMDIR/phy_namelist.rc >> phy_namelist.rc
 
-export SKEB=${SKEB:-"0.0, -999., -999., -999, -999"}
-export ISEED_SKEB=${ISEED_SKEB:-0}
-export SKEB_TAU=${SKEB_TAU:-"2.164E4, 1.728E5, 2.592E6, 7.776E6, 3.1536E7"}
-export SKEB_LSCALE=${SKEB_LSCALE:="1000.E3, 1000.E3, 2000.E3, 2000.E3, 2000.E3"}
-export SKEB_VFILT=${SKEB_VFILT:-40}
-export SKEB_DISS_SMOOTH=${SKEB_DISS_SMOOTH:-12}
+  # additional namelist parameters for stochastic physics.  Default is off
+  export SPPT=${SPPT:-"0.0,0.0,0.0,0.0,0.0"}
+  export ISEED_SPPT=${ISEED_SPPT:-0}
+  export SPPT_LOGIT=${SPPT_LOGIT:-.TRUE.}
+  export SPPT_TAU=${SPPT_TAU:-"21600,2592500,25925000,7776000,31536000"}
+  export SPPT_LSCALE=${SPPT_LSCALE:-"500000,1000000,2000000,2000000,2000000"}
 
-export VC=${VC:-0.0}
-export ISEED_VC=${ISEED_VC:-0}
-export VCAMP=${VCAMP:-"0.0, -999., -999., -999, -999"}
-export VC_TAU=${VC_TAU:-"4.32E4, 1.728E5, 2.592E6, 7.776E6, 3.1536E7"}
-export VC_LSCALE=${VC_LSCALE:-"1000.E3, 1000.E3, 2000.E3, 2000.E3, 2000.E3"}
-[[ $LEVR -gt $LEVS ]] && export LEVR=$LEVS
+  export SHUM=${SHUM:-"0.0, -999., -999., -999, -999"}
+  export ISEED_SHUM=${ISEED_SHUM:-0}
+  export SHUM_TAU=${SHUM_TAU:-"2.16E4, 1.728E5, 6.912E5, 7.776E6, 3.1536E7"}
+  export SHUM_LSCALE=${SHUM_LSCALE:-"500.E3, 1000.E3, 2000.E3, 2000.E3, 2000.E3"}
 
-# GSM/WAM namelists
-envsubst < $PARMDIR/atm_namelist > atm_namelist
-$NLN $PARMDIR/gwp_in .
-$NLN $PARMDIR/ion_in .
-$NLN $PARMDIR/solar_in .
-envsubst < $PARMDIR/wam_control_in > wam_control_in
+  export SKEB=${SKEB:-"0.0, -999., -999., -999, -999"}
+  export ISEED_SKEB=${ISEED_SKEB:-0}
+  export SKEB_TAU=${SKEB_TAU:-"2.164E4, 1.728E5, 2.592E6, 7.776E6, 3.1536E7"}
+  export SKEB_LSCALE=${SKEB_LSCALE:="1000.E3, 1000.E3, 2000.E3, 2000.E3, 2000.E3"}
+  export SKEB_VFILT=${SKEB_VFILT:-40}
+  export SKEB_DISS_SMOOTH=${SKEB_DISS_SMOOTH:-12}
 
-$NLN atm_namelist.rc ./model_configure
+  export VC=${VC:-0.0}
+  export ISEED_VC=${ISEED_VC:-0}
+  export VCAMP=${VCAMP:-"0.0, -999., -999., -999, -999"}
+  export VC_TAU=${VC_TAU:-"4.32E4, 1.728E5, 2.592E6, 7.776E6, 3.1536E7"}
+  export VC_LSCALE=${VC_LSCALE:-"1000.E3, 1000.E3, 2000.E3, 2000.E3, 2000.E3"}
+  [[ $LEVR -gt $LEVS ]] && export LEVR=$LEVS
 
-# special IAU handling for surface analysis
- if [ $DOIAU = YES ]; then
+  # GSM/WAM namelists
+  envsubst < $PARMDIR/atm_namelist > atm_namelist
+  $NLN $PARMDIR/gwp_in .
+  $NLN $PARMDIR/ion_in .
+  $NLN $PARMDIR/solar_in .
+  envsubst < $PARMDIR/wam_control_in > wam_control_in
+
+  $NLN atm_namelist.rc ./model_configure
+
+  # special IAU handling for surface analysis
+  if [ $DOIAU = YES ]; then
     export CDATE_SFC=${CDATE_SFC:-$(echo idate|$SFCHDR ${SFCI}$FM)}
     export FHINI_SFC=${FHINI_SFC:-$(echo fhour|$SFCHDR ${SFCI}$FM)}
     eval $CHGSFCFHREXEC $SFCI $CDATE_SIG $FHINI
- fi
-
+  fi
+  # link in the appropriate SWIO rc files
+  if [[ $SWIO = .true. ]] ; then
+    for iomodel in $SWIO_MODELS; do
+      infile=`sed -n -e '/^'"$iomodel"'_attributes/,/ConfigFile/ p' nems.configure | tail -n 1 | sed 's/^[ \t]*//' | cut -d' ' -f3`
+      $NLN $PARMDIR/$infile .
+    done
+  fi
 fi # NEMS
 
 eval $FCSTENV $PGM $REDOUT$PGMOUT $REDERR$PGMERR

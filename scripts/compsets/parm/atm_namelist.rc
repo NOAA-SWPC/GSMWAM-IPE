@@ -1,4 +1,4 @@
-core: $core
+core:           ${dyncore}
 print_esmf:     ${print_esmf}
 nhours_dfini=0
 #nam_atm +++++++++++++++++++++++++++
