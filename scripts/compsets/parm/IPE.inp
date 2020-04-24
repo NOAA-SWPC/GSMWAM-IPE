@@ -29,7 +29,7 @@
 /
 &ipecap
   mesh_height_min = 0.
-  mesh_height_max = 782.
+  mesh_height_max = 2000.
   mesh_write      = 0
   mesh_write_file = 'ipemesh'
   mesh_fill       = ${mesh_fill}
