@@ -12,3 +12,6 @@
 	path = SWIO
 	url = https://github.com/NOAA-SWPC/SWIO.git
 	branch = master
+[submodule "DATAPOLL"]
+	path = DATAPOLL
+	url = https://github.com/NOAA-SWPC/DATAPOLL.git

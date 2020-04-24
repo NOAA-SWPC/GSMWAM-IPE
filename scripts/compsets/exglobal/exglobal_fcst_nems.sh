@@ -1385,7 +1385,7 @@ cat << EOF > $DATA/nems.configure
 #############################################
 
 # EARTH #
-EARTH_component_list: MED ATM IPM AIO IO
+EARTH_component_list: MED ATM IPM AIO IO DAT
 EARTH_attributes::
   Verbosity = max
 ::
@@ -1429,20 +1429,33 @@ IO_attributes::
   ConfigFile = swio.ipe.rc
 ::
 
+# DAT #
+DAT_model:                      datapoll
+DAT_petlist_bounds:             $dat_petlist_bounds
+DAT_attributes::
+  Verbosity = max
+  pollDir = ${data_poll_dir:-${DATA}}
+  pollSec = $data_poll_interval
+  pollMax = $data_poll_max
+::
+
 # Run Sequence #
 runSeq::
-  @$coupling_interval_slow_sec
-    ATM -> MED :remapMethod=redist
-    MED
-    MED -> IPM :remapMethod=redist
-    @$coupling_interval_fast_sec
-      ATM
+  @$data_interval_sec
+    @$coupling_interval_slow_sec
+      ATM -> MED :remapMethod=redist
+      MED
+      MED -> IPM :remapMethod=redist
+      @$coupling_interval_fast_sec
+        ATM
+      @
+      IPM
+      AIO
+      ATM -> AIO
+      IO
+      IPM -> IO
     @
-    IPM
-    AIO
-    ATM -> AIO
-    IO
-    IPM -> IO
+    DAT
   @
 ::
 EOF
