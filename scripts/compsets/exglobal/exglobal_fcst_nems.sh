@@ -1056,7 +1056,7 @@ if [[ $SWIO = .true. ]] ; then
       STEP=1
       while [ $STEP -le $STEPS ] ; do
         TIMESTAMP=`$MDATE $((STEP*cadence/60)) ${FDATE}00`
-        $NLN ${COMOUT}/${prefix}.${TIMESTAMP}.nc ${DATA}/.
+        $NLN ${COMOUT}/${prefix}.${TIMESTAMP:0:8}_${TIMESTAMP:8}00.nc ${DATA}/.
         STEP=$((STEP+1))
       done
     fi
