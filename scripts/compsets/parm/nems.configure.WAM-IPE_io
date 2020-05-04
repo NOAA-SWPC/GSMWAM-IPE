@@ -42,14 +42,16 @@ IO_attributes::
 ::
 # Run Sequence #
 runSeq::
-  @$coupling_interval_slow_sec
-    ATM -> MED :remapMethod=redist
-    MED
-    MED -> IPM :remapMethod=redist
-    @$coupling_interval_fast_sec
-      ATM
+  @${IO_CADENCE}
+    @$coupling_interval_slow_sec
+      ATM -> MED :remapMethod=redist
+      MED
+      MED -> IPM :remapMethod=redist
+      @$coupling_interval_fast_sec
+        ATM
+      @
+      IPM
     @
-    IPM
     AIO
     ATM -> AIO
     IO
