@@ -2,10 +2,18 @@
 ####  SWPC Mediator Configuration File  #####
 #############################################
 
+# Output settings for 2D and 3D meshes.
+# Files will be created in VTK data file format.
+#
 mesh_file_prefix:  med
 mesh_write: false
 
-interpolation_levels::
+# Enclose vertical levels for 3D interpolation mesh
+# between keyword 'interpolation_levels::' and '::'.
+# If keyword is missing or commented out, levels
+# will be imported from IPE.
+#
+# interpolation_levels::
 90
 92
 94
