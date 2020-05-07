@@ -23,6 +23,7 @@ import_fields::
     O_plus_2P_density
     ion_temperature
     electron_temperature
+    electron_density
     eastward_exb_velocity
     northward_exb_velocity
     upward_exb_velocity

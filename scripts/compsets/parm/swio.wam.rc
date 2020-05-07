@@ -13,6 +13,8 @@ import_fields::
     O_Density
     O2_Density
     N2_Density
+    thermosphere_mass_density
+    thermosphere_mean_molecular_mass
 ::
 #
 # Output file format.
