@@ -1,0 +1,25 @@
+EARTH_component_list:       ATM AIO
+
+# WAM #
+ATM_model:                  wam
+ATM_petlist_bounds:         $atm_petlist_bounds
+ATM_attributes::
+  Verbosity = max
+::
+# AIO #
+AIO_model:                  swio
+AIO_petlist_bounds:         $atm_petlist_bounds
+AIO_attributes::
+  Verbosity = max
+  ConfigFile = swio.wam.rc
+::
+
+runSeq::
+  @${AIO_CADENCE}.0
+    @${DELTIM}.0
+      ATM
+    @
+    ATM -> AIO
+    AIO
+  @
+::

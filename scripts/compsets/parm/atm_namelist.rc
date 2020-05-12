@@ -1,0 +1,100 @@
+core:           ${dyncore}
+print_esmf:     ${print_esmf}
+nhours_dfini=0
+#nam_atm +++++++++++++++++++++++++++
+nlunit:                  35
+deltim:                  ${DELTIM}.0
+fhrot:                   $FHROT
+namelist:                atm_namelist
+total_member:            $ENS_NUM
+grib_input:              $GB
+PE_MEMBER01:             $PE1
+PE_MEMBER02:             $PE2
+PE_MEMBER03:             $PE3
+PE_MEMBER04:             $PE4
+PE_MEMBER05:             $PE5
+PE_MEMBER06:             $PE6
+PE_MEMBER07:             $PE7
+PE_MEMBER08:             $PE8
+PE_MEMBER09:             $PE9
+PE_MEMBER10:             $PE10
+PE_MEMBER11:             $PE11
+PE_MEMBER12:             $PE12
+PE_MEMBER13:             $PE13
+PE_MEMBER14:             $PE14
+PE_MEMBER15:             $PE15
+PE_MEMBER16:             $PE16
+PE_MEMBER17:             $PE17
+PE_MEMBER18:             $PE18
+PE_MEMBER19:             $PE19
+PE_MEMBER20:             $PE20
+PE_MEMBER21:             $PE21
+# For stachastic purturbed runs -  added by Dhou and Wyang
+  --------------------------------------------------------
+#  ENS_SPS, logical control for application of stochastic perturbation scheme
+#  HH_START, start hour of forecast, and modified ADVANCECOUNT_SETUP
+#  HH_INCREASE and HH_FINAL are fcst hour increment and end hour of forecast
+#  ADVANCECOUNT_SETUP is an integer indicating the number of time steps between
+#  integrtion_start and the time when model state is saved for the _ini of the
+#  GEFS_Coupling, currently is 0h.
+HH_INCREASE:             $FH_INC
+HH_FINAL:                $FHMAX
+HH_START:                $FHINI
+ADVANCECOUNT_SETUP:      $ADVANCECOUNT_SETUP
+ENS_SPS:                 $ENS_SPS
+HOUTASPS:                $HOUTASPS
+#ESMF_State_Namelist +++++++++++++++
+RUN_CONTINUE:            .false.
+#
+dt_int:                  $DELTIM
+dt_num:                  0
+dt_den:                  1
+start_year:              $C_YEAR
+start_month:             $C_MONTH
+start_day:               $C_DAY
+start_hour:              $C_HOUR
+start_minute:            0
+start_second:            0
+nhours_fcst:             $FHMAX
+restart:                 $RESTART
+nhours_fcst1:            $FHMAX
+im:                      $LONB
+jm:                      $LATB
+global:                  .true.
+nhours_dfini:            $nhours_dfini
+adiabatic:               $ADIAB
+lsoil:                   $LSOIL
+passive_tracer:          $PASSIVE_TRACER
+dfilevs:                 $DFILEVS
+ldfiflto:                $LDFIFLTO
+ldfi_grd:                $LDFI_GRD
+num_tracers:             $NTRAC
+lwrtgrdcmp:              $LWRTGRDCMP
+nemsio_in:               $NEMSIO_IN
+#jwstart added quilt
+###############################
+#### Specify the I/O tasks ####
+###############################
+quilting:                $QUILTING   #For asynchronous quilting/history writes
+read_groups:             0
+read_tasks_per_group:    0
+write_groups:            $WRT_GROUP
+write_tasks_per_group:   $WRTPE_PER_GROUP
+num_file:                $NUM_FILE                   #
+filename_base:           $FILENAME_BASE
+file_io_form:            $FILE_IO_FORM
+file_io:                 'DEFERRED' 'DEFERRED' 'DEFERRED' 'DEFERRED'  #
+write_dopost:            $WRITE_DOPOST          # True--> run do on quilt
+iau:                     $IAU                   # True--> shift dates in output files
+post_gribversion:        $POST_GRIBVERSION      # True--> grib version for post output files
+gocart_aer2post:         $GOCART_AER2POST
+write_nemsioflag:        $WRITE_NEMSIOFLAG      # True--> Write nemsio run history files
+nfhout:                  $FHOUT
+nfhout_hf:               $FHOUT_HF
+nfhmax_hf:               $FHMAX_HF
+nsout:                   $nsout
+io_recl:                 100
+io_position:             ' '
+io_action:               'WRITE'
+io_delim:                ' '
+io_pad:                  ' '

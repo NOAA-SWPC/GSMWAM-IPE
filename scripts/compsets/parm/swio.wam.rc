@@ -1,0 +1,95 @@
+#############################################
+####  SWIO Run-Time Configuration File  #####
+#############################################
+#
+#  Imported fields
+#
+import_fields::
+    height
+    temp_neutral
+    eastward_wind_neutral
+    northward_wind_neutral
+    upward_wind_neutral
+    O_Density
+    O2_Density
+    N2_Density
+    thermosphere_mass_density
+    thermosphere_mean_molecular_mass
+::
+#
+# Output file format.
+#
+# Choose from:
+# - hdf5
+# - pnetcdf or parallel-netcdf
+#
+output_format: pnetcdf
+#
+# Output file prefix.
+#
+# Output file names are created as:
+#   <prefix>.<datetime>.<suffix>
+# where:
+#   <prefix>   : is the string provided via
+#                output_file_prefix keyword
+#   <datetime> : inported field timestamp,
+#                formatted as: YYYYMMDD_hhmmss
+#   <suffix>   : determined from output format:
+#                'hd5' for hdf5, 'nc' for pnetcdf
+#
+output_file_prefix: gsm
+#
+# Output grid type.
+#
+# Supported types are:
+# - latlon: 2D/3D regular lat/lon spherical grid
+# - none  : native (imported) grid/mesh
+#
+output_grid_type: latlon
+#
+# The following keywords are read only if grid
+# type is 'latlon'
+#
+# Output grid size.
+#
+# Provides the lat/lon grid resolution as
+#   #longitudes #latitudes [#levels]
+#
+# If #levels is missing, a 2D lat/lon grid will be built
+#
+# If #levels > 0, the minimum and maximum value of the
+# vertical coordinate (km) will be read via the
+# 'output_grid_level_range' keyword below.
+#
+# If #levels = 0, the grid's vertical levels are read
+# from the 'output_grid_level_values' table (km)
+#
+# If #levels < 0, ungridded #nlevels will be added
+#
+output_grid_size: 90 91 -150
+#
+# Minimin and maximum values of vertical coordinate (km)
+# Used if #levels > 0
+#
+output_grid_level_range: 90. 1000.
+#
+# List of vertical levels (km)
+# Used if #levels = 0
+#
+output_grid_level_values::
+   90.
+  150.
+  300.
+  400.
+  500.
+  600.
+  700.
+  800.
+::
+#
+# If true, this flag transforms the vertical coordinate (v),
+# assumed in km, to heights (h) relative to the average
+# Earth's radius (R=6,371.2 km), accordina to the formula:
+#   h = 1 + v/R
+#
+output_grid_level_relative: false
