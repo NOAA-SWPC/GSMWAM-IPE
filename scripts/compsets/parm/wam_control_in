@@ -2,7 +2,10 @@
      wam_climate=.false., wam_swpc_3day=.true., wam_cires_rdata=.false.,
      wam_swin = .true.,
      wam_smin=.false., wam_smax=.false., wam_saver=.true., wam_geostorm=.false.,
-     wam_gwphys=.false., wam_solar_in=.false., wam_ion_in=.false.
-     wam_das_in=.false., wam_smet_in=.false., wam_netcdf_inout=.true.
-     wam_tides_diag=.false., wam_pws_diag=.false., wam_gws_diag=.false.
+     wam_gwphys=.false., wam_solar_in=.false., wam_ion_in=.false.,
+     wam_das_in=.false., wam_smet_in=.false., wam_netcdf_inout=.true.,
+     wam_tides_diag=.false., wam_pws_diag=.false., wam_gws_diag=.false.,
+     JH0=$JH0, JH_tanh=$JH_tanh, JH_semiann=$JH_semiann, JH_ann=$JH_ann,
+     skeddy0=$skeddy0, skeddy_semiann=$skeddy_semiann, skeddy_ann=$skeddy_ann,
+     tkeddy0=$tkeddy0, tkeddy_semiann=$tkeddy_semiann, tkeddy_ann=$tkeddy_ann
 /

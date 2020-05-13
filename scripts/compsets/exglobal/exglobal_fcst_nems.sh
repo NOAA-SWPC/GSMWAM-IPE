@@ -669,6 +669,20 @@ export F107_KP_INTERVAL=${F107_KP_INTERVAL:-10800}
 export IPEFREQ=${IPEFREQ:-3600}
 export IPEFMAX=${IPEFMAX:-$((FHMAX*3600))}
 
+## wam_control_in
+export JH0=${JH0:-1.75}
+export JH_tanh=${JH_tanh:-0.5}
+export JH_semiann=${JH_semiann:-0.5}
+export JH_ann=${JH_ann:-0.0}
+
+export skeddy0=${skeddy0:-140.0}
+export skeddy_semiann=${skeddy_semiann:-60.0}
+export skeddy_ann=${skeddy_ann:-0.0}
+
+export tkeddy0=${tkeddy0:-280.0}
+export tkeddy_semiann=${tkeddy_semiann:-0.0}
+export tkeddy_ann=${tkeddy_ann:-0.0}
+
 ## for post
 export WRITE_DOPOST=${WRITE_DOPOST:-.false.}
 export GOCART_AER2POST=${GOCART_AER2POST:-.false.}
