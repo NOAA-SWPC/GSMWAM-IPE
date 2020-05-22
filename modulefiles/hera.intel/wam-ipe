@@ -61,7 +61,7 @@ module load szip/2.1
 
 module use -a /scratch1/NCEPDEV/swpc/Raffaele.Montuoro/swpc.spacepara/modulefiles
 module load pnetcdf/1.12.1
-module load comio/0.0.1
+module load comio/0.0.3
 
 ##
 ## use workaround to prevent possible runtime failures with Intel MPI
