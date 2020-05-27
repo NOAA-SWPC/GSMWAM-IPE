@@ -1125,7 +1125,7 @@ if [ $GOCART == 1 ] ; then
 
  ln -sf $FIX_NGAC  ngac_fix
 fi
-# below seem unnecessary
+
 if [ $DOIAU = YES ]; then
   export RESTART=.false.
 
@@ -1135,6 +1135,8 @@ if [ $DOIAU = YES ]; then
 
   export IAU=.true.
 
+else
+  export IAU=.false.
 fi
 
 
