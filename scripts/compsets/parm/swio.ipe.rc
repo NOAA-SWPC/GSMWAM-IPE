@@ -36,17 +36,18 @@ import_fields::
 #  output fields from input ones, according to the syntax
 #  below:
 #
-#  <function_name> <input_field1> ... <input_fieldN> <output_field1> <output_units1> ... <output_fieldM> <output_unitsM> <scaling_factor>
+#  <function_name> <input_field1> ... <input_fieldN> [<input_parm1> ... <input_parmL>] <output_field1> <output_units1> ... <output_fieldM> <output_unitsM> <scaling_factor>
 #
 #  Available functions are:
 #  - column_integrate
 #  - column_max_point
+#  - column_max_region
 #
 #  Note that <scaling_factor> is optional as it may or may not be used depending on the function
 #
 compute_fields::
     column_integrate    electron_density    tec    TECu    1.d-13
-    column_max_point    electron_density    NmF2   m-3     HmF2    km
+    column_max_region   electron_density    200.   NmF2   m-3     HmF2    km
 ::
 
 #
