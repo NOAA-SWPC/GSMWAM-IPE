@@ -47,7 +47,7 @@ import_fields::
 #
 compute_fields::
     column_integrate    electron_density    tec    TECu    1.d-13
-    column_max_region   electron_density    200.   NmF2   m-3     HmF2    km
+    column_max_region   electron_density    200.   1000.   NmF2   m-3     HmF2    km
 ::
 
 #
