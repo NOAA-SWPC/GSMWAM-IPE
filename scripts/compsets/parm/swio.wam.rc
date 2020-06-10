@@ -60,6 +60,7 @@ output_metadata::
   init_date     $SWIO_IDATE
   start_date    $SWIO_SDATE
   end_date      $SWIO_EDATE
+  fcast_date    __swio_field_timestamp__
   run_type      $CDUMP
 ::
 #
