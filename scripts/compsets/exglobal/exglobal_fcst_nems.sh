@@ -1133,15 +1133,20 @@ if [ $DOIAU = YES ]; then
   export FHZER=3
 
   export IAU=.true.
-  SWIO_IDATE=$($NDATE +6 $CDATE)00
+  SWIO_IDATE=$($NDATE +6 $CDATE)0000
 else
   export IAU=.false.
 fi
 
-export SWIO_IDATE=${SWIO_IDATE:-${CDATE}00}
-export SWIO_SDATE=${FDATE}00
-export SWIO_EDATE=$($NDATE $((FHMAX-$FHROT)) $FDATE)00
+SWIO_IDATE=${SWIO_IDATE:-${CDATE}0000}
+SWIO_SDATE=${FDATE}0000
+SWIO_EDATE=$($NDATE $((FHMAX-$FHROT)) $FDATE)0000
+
 export CDUMP=${CDUMP:-"compset_run"}
+export SWIO_IDATE=${SWIO_IDATE:0:8}_${SWIO_IDATE:8}
+export SWIO_SDATE=${SWIO_SDATE:0:8}_${SWIO_SDATE:8}
+export SWIO_EDATE=${SWIO_EDATE:0:8}_${SWIO_EDATE:8}
+
 
 # Mostly IDEA-related stuff in this section
 #--------------------------------------------------------------
