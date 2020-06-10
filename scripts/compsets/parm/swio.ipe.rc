@@ -83,6 +83,21 @@ output_datatype: float
 #
 output_file_prefix: ipe
 #
+# Output metadata.
+#
+# Metadata can be added to output files as global
+# string attributes created from <key> <value>
+# row entries in the table below. If <value> is
+# missing, it will be set to "N/A".
+#
+output_metadata::
+    init_date     2013031600
+    start_date    2013031600
+    end_date      2013031601
+    run_type      "This run is wfs"
+    compset_run
+::
+#
 # Output grid type.
 # 
 # Supported types are:
