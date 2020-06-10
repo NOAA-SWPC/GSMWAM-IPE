@@ -91,12 +91,11 @@ output_file_prefix: ipe
 # missing, it will be set to "N/A".
 #
 output_metadata::
-    init_date     2013031600
-    start_date    2013031600
-    end_date      2013031601
-    run_type      "This run is wfs"
-    compset_run
-    fcast_date    __swio_field_timestamp__
+  init_date     $SWIO_IDATE
+  start_date    $SWIO_SDATE
+  end_date      $SWIO_EDATE
+  fcast_date    __swio_field_timestamp__
+  run_type      $CDUMP
 ::
 #
 # Output grid type.
