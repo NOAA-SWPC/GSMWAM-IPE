@@ -96,6 +96,7 @@ output_metadata::
     end_date      2013031601
     run_type      "This run is wfs"
     compset_run
+    fcast_date    __swio_field_timestamp__
 ::
 #
 # Output grid type.
