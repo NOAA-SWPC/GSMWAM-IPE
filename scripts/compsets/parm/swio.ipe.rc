@@ -28,6 +28,28 @@ import_fields::
     northward_exb_velocity
     upward_exb_velocity
 ::
+
+#
+#  Computed fields
+#
+#  Use SWIO internal calculator to compute additional
+#  output fields from input ones, according to the syntax
+#  below:
+#
+#  <function_name> <input_field1> ... <input_fieldN> [<input_parm1> ... <input_parmL>] <output_field1> <output_units1> ... <output_fieldM> <output_unitsM> <scaling_factor>
+#
+#  Available functions are:
+#  - column_integrate
+#  - column_max_point
+#  - column_max_region
+#
+#  Note that <scaling_factor> is optional as it may or may not be used depending on the function
+#
+compute_fields::
+    column_integrate    electron_density    tec    TECu    1.d-13
+    column_max_region   electron_density    200.   1000.   NmF2   m-3     HmF2    km
+::
+
 #
 # Output file format.
 #
@@ -36,6 +58,16 @@ import_fields::
 # - pnetcdf or parallel-netcdf
 #
 output_format: pnetcdf
+#
+# Output datatype
+#
+# Supported datatypes for output variables are:
+# - integer: write variables as integers
+# - float  : write variables as real, single precision
+# - double : write variables as real, double precision
+# - native : write variables using their original type
+#
+output_datatype: float
 #
 # Output file prefix.
 #
@@ -50,6 +82,21 @@ output_format: pnetcdf
 #                'hd5' for hdf5, 'nc' for pnetcdf
 #
 output_file_prefix: ipe
+#
+# Output metadata.
+#
+# Metadata can be added to output files as global
+# string attributes created from <key> <value>
+# row entries in the table below. If <value> is
+# missing, it will be set to "N/A".
+#
+output_metadata::
+  init_date     $SWIO_IDATE
+  start_date    $SWIO_SDATE
+  end_date      $SWIO_EDATE
+  fcst_date     __swio_field_timestamp__
+  run_type      $CDUMP
+::
 #
 # Output grid type.
 # 

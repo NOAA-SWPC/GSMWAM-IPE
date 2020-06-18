@@ -847,7 +847,6 @@ else
   FDATE=$(echo $CIPEDATE | cut -c1-10)
 fi
 
-
 FH=$((10#$FHINI))
 [[ $FH -lt 10 ]]&&FH=0$FH
 if [[ $FHINI -gt 0 ]] ; then
@@ -1134,10 +1133,19 @@ if [ $DOIAU = YES ]; then
   export FHZER=3
 
   export IAU=.true.
-
+  SWIO_IDATE=$($NDATE +6 $CDATE)0000
 else
   export IAU=.false.
 fi
+
+SWIO_IDATE=${SWIO_IDATE:-${CDATE}0000}
+SWIO_SDATE=${FDATE}0000
+SWIO_EDATE=$($NDATE $((FHMAX-$FHROT)) $FDATE)0000
+
+export CDUMP=${CDUMP:-"compset_run"}
+export SWIO_IDATE=${SWIO_IDATE:0:8}_${SWIO_IDATE:8}
+export SWIO_SDATE=${SWIO_SDATE:0:8}_${SWIO_SDATE:8}
+export SWIO_EDATE=${SWIO_EDATE:0:8}_${SWIO_EDATE:8}
 
 
 # Mostly IDEA-related stuff in this section
@@ -1308,11 +1316,11 @@ if [[ $NEMS = .true. ]] ; then
     export FHINI_SFC=${FHINI_SFC:-$(echo fhour|$SFCHDR ${SFCI}$FM)}
     eval $CHGSFCFHREXEC $SFCI $CDATE_SIG $FHINI
   fi
-  # link in the appropriate SWIO rc files
+  # envsubst in the appropriate SWIO rc files
   if [[ $SWIO = .true. ]] ; then
     for iomodel in $SWIO_MODELS; do
       infile=`sed -n -e '/^'"$iomodel"'_attributes/,/ConfigFile/ p' nems.configure | tail -n 1 | sed 's/^[ \t]*//' | cut -d' ' -f3`
-      $NLN $PARMDIR/$infile .
+      envsubst < $PARMDIR/$infile > $infile
     done
   fi
 fi # NEMS

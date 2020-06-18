@@ -25,6 +25,16 @@ import_fields::
 #
 output_format: pnetcdf
 #
+# Output datatype
+#
+# Supported datatypes for output variables are:
+# - integer: write variables as integers
+# - float  : write variables as real, single precision
+# - double : write variables as real, double precision
+# - native : write variables using their original type
+#
+output_datatype: float
+#
 # Output file prefix.
 #
 # Output file names are created as:
@@ -38,6 +48,21 @@ output_format: pnetcdf
 #                'hd5' for hdf5, 'nc' for pnetcdf
 #
 output_file_prefix: gsm
+#
+# Output metadata.
+#
+# Metadata can be added to output files as global
+# string attributes created from <key> <value>
+# row entries in the table below. If <value> is
+# missing, it will be set to "N/A".
+#
+output_metadata::
+  init_date     $SWIO_IDATE
+  start_date    $SWIO_SDATE
+  end_date      $SWIO_EDATE
+  fcst_date     __swio_field_timestamp__
+  run_type      $CDUMP
+::
 #
 # Output grid type.
 #
