@@ -1,9 +1,5 @@
 &SPACEMANAGEMENT
  GRID_FILE = '$IPEGRIDFILENAME',
- NLP              = 170,
- NMP              = 80,
- NPTS2D           = 44514,
- NFLUXTUBE        = 1115
 /
 &TIMESTEPPING
  TIME_STEP   = ${DELTIM_IPE}D0,
