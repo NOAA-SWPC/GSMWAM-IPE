@@ -30,6 +30,16 @@ import_fields::
 ::
 
 #
+#  Output fields
+#
+#  List import fields to be written to file and set corresponding
+#  output variable name (optional) using the following syntax:
+#
+#  <import_field_name>    [<output_variable_name>]
+output_fields::
+::
+
+#
 #  Computed fields
 #
 #  Use SWIO internal calculator to compute additional

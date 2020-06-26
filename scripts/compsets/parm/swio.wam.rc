@@ -17,6 +17,25 @@ import_fields::
     thermosphere_mean_molecular_mass
 ::
 #
+#  Output fields
+#
+#  List import fields to be written to file and set corresponding
+#  output variable name (optional) using the following syntax:
+#
+#  <import_field_name>    [<output_variable_name>]
+output_fields::
+    height                              wam_height_levels
+    temp_neutral
+    eastward_wind_neutral
+    northward_wind_neutral
+    upward_wind_neutral
+    O_Density
+    O2_Density
+    N2_Density
+    thermosphere_mass_density
+    thermosphere_mean_molecular_mass
+::
+#
 # Output file format.
 #
 # Choose from:
