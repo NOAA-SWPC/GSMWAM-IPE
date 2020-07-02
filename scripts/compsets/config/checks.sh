@@ -129,7 +129,7 @@ fi
 # check if WAM ICs are in place if GSM running
 [[ $NEMS = .true. ]] && if [ $RESTART = .false. ] ; then # cold start
 	echo "checking for atmospheric/surface initial conditions in ROTDIR: $SEARCH$CDATE"
-	if [[ `find -L $ROTDIR -type f -iname "$SEARCH$CDATE" | wc -l` -lt 2 ]] ; then
+	if [[ `find -L $ROTDIR -maxdepth 1 -type f -iname "$SEARCH$CDATE" | wc -l` -lt 2 ]] ; then
 		echo "   ICs not found in ROTDIR. checking for IC_DIR"
 		if [[ -n $IC_DIR ]] ; then
 			echo "   IC_DIR has been set to $IC_DIR"
@@ -146,8 +146,8 @@ fi
 	fi
 	# now we check to see that the surface idate&fhour match the atmospheric idate&fhour
 	echo "making sure our ICs match idate and fhour"
-	export ATMIN=`find -L $ROTDIR -type f -iname "$ATM*$CDATE" | head -1`
-	export SFCIN=`find -L $ROTDIR -type f -iname "$SFC*$CDATE" | head -1`
+	export ATMIN=`find -L $ROTDIR -maxdepth 1 -type f -iname "$ATM*$CDATE" | head -1`
+	export SFCIN=`find -L $ROTDIR -maxdepth 1 -type f -iname "$SFC*$CDATE" | head -1`
 	if [ $NEMSIO_IN = .true. ] ; then
 		if [ $($NEMSIOGET $ATMIN fhour) != $($NEMSIOGET $SFCIN fhour) ] || \
 		   [ $($NEMSIOGET $ATMIN idate) != $($NEMSIOGET $SFCIN idate) ] ; then
@@ -202,9 +202,9 @@ if [ $IPE = .true. ] ; then
 	export PLASI=${PLASI:-$ROTDIR/$IPESEARCH}
 	echo "searching ROTDIR, then RESTARTDIR, then IPE_IC_DIR for $IPESEARCH"
 	# then we search ROTDIR, then RESTARTDIR, then IPE_IC_DIR
-	if [[ -f `find -L $ROTDIR -type f -iname "$IPESEARCH" | head -1` ]] ; then
+	if [[ -f `find -L $ROTDIR -maxdepth 1 -type f -iname "$IPESEARCH" | head -1` ]] ; then
 		echo "   found in ROTDIR"
-	elif [[ -f `find -L $RESTARTDIR -type f -iname "$IPESEARCH" | head -1` ]] ; then
+	elif [[ -f `find -L $RESTARTDIR -maxdepth 1 -type f -iname "$IPESEARCH" | head -1` ]] ; then
 		echo "   found in RESTARTDIR, copying to ROTDIR"
 		$NCP $RESTARTDIR/$IPESEARCH $ROTDIR
 	# IPE_IC_DIR has been defaulted to IC_DIR if IC_DIR is defined
