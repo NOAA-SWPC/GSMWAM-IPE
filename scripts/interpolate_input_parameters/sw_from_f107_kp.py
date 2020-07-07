@@ -23,8 +23,8 @@ def hpi_from_gw(gw):
   else:
     return '10'
 
-def swbt_calc(swbz,swby):
-  return math.sqrt(swbz**2+swby**2)
+def swbt_calc(swbz,swby,swbx=0):
+  return math.sqrt(swbz**2+swby**2+swbx**2)
 
 def swden_calc(): # this isn't used?
   return 5.0
