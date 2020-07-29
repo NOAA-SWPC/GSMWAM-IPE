@@ -36,6 +36,10 @@ output_fields::
     thermosphere_mean_molecular_mass
 ::
 #
+#  Imported masking field
+#
+import_mask_field: temp_neutral 0.0 -1.e+33
+#
 #  Computed fields
 #
 #  Use SWIO internal calculator to compute additional
