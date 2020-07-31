@@ -61,6 +61,14 @@ compute_fields::
 ::
 
 #
+# Output create mode
+#
+# Supported modes are: clobber (default), preserve-links
+# - clobber       : overwrite existing files (default)
+# - preserve-links: do not overwrite linked output targets
+#
+output_create_mode: preserve-links
+#
 # Output file format.
 #
 # Choose from:
