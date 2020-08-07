@@ -24,7 +24,9 @@ FILE_FMT = "%Y%m%dT%H%M"
 PATH_FMT = "%Y%m%d"
 GEOSPACE_TIME_GAP  =  3 # minutes
 AVERAGING_INTERVAL = 20 # minutes
-DELAY_INTERVAL     = 50 + GEOSPACE_TIME_GAP # minutes
+L1_DELAY           = 50 # minutes
+SW_DATE_BACKWARDS  = L1_DELAY + AVERAGING_INTERVAL
+DELAY_INTERVAL     = L1_DELAY + GEOSPACE_TIME_GAP # minutes
 TIME_CONSTANT      = 60*5
 MAX_SEARCH_DIST    = 1
 DEFAULT_PATH = '.'
@@ -76,7 +78,8 @@ class key_dependent_dict(defaultdict):
 class InputParameters(object):
     def __init__(self, start_date, mins):
         self.start_date = start_date
-        self.date_list = [start_date + timedelta(minutes=i) for i in range(mins+1)]
+        self.sw_date_list = [start_date + timedelta(minutes=i-SW_DATE_BACKWARDS) for i in range(mins+SW_DATE_BACKWARDS)]
+        self.date_list = [start_date + timedelta(minutes=i) for i in range(mins)]
         self.f107d = InputParameter(lambda x: F107_MIN) # 'self_avg'
         self.f107  = InputParameter(lambda x: F107_MIN) # np.nanmean(self.f107d.values())
         self.kpa   = InputParameter(lambda x: KP_RELAX)
@@ -109,13 +112,13 @@ class InputParameters(object):
         return key_dependent_dict(relax_func, zip(mydict.keys(),b))
 
     def parse_geospace_input(self, input_directory):
-        swbz  = {key: None for key in self.date_list}
-        swbx  = {key: None for key in self.date_list}
-        swby  = {key: None for key in self.date_list}
-        swden = {key: None for key in self.date_list}
-        swvel = {key: None for key in self.date_list}
+        swbz  = {key: None for key in self.sw_date_list}
+        swbx  = {key: None for key in self.sw_date_list}
+        swby  = {key: None for key in self.sw_date_list}
+        swden = {key: None for key in self.sw_date_list}
+        swvel = {key: None for key in self.sw_date_list}
 
-        for date in self.date_list:
+        for date in self.sw_date_list:
             try:
                 fd = date - timedelta(minutes=DELAY_INTERVAL)
                 file = "{}/{}/swpc/geospace_input-{}.xml".format(input_directory,\
@@ -129,14 +132,14 @@ class InputParameters(object):
             except:
                 pass
 
-        swbz  = self.linear_int_missing_vals(swbz,  self.swbz.backwards_search)
-        swbx  = self.linear_int_missing_vals(swbx,  self.swbx.backwards_search)
-        swby  = self.linear_int_missing_vals(swby,  self.swby.backwards_search)
-        swvel = self.linear_int_missing_vals(swvel, self.swvel.backwards_search)
-        swden = self.linear_int_missing_vals(swden, self.swden.backwards_search)
+        swbz  = self.linear_int_missing_vals(swbz,  self.swbz.backwards_search, True)
+        swbx  = self.linear_int_missing_vals(swbx,  self.swbx.backwards_search, True)
+        swby  = self.linear_int_missing_vals(swby,  self.swby.backwards_search, True)
+        swvel = self.linear_int_missing_vals(swvel, self.swvel.backwards_search, True)
+        swden = self.linear_int_missing_vals(swden, self.swden.backwards_search, True)
 
         # now backfill with all available data
-        for k in self.date_list:
+        for k in self.sw_date_list:
             self.swbz.dict[k]  = swbz[k]
             self.swby.dict[k]  = swby[k]
             self.swbx.dict[k]  = swbx[k]
@@ -156,12 +159,12 @@ class InputParameters(object):
             self.swang.dict[k] = swang_calc(self.swby.dict[k],self.swbz.dict[k])
 
     def parse_aurora_power(self, input_directory):
-        hpn  = {key: None for key in self.date_list}
-        hps  = {key: None for key in self.date_list}
-        hpin = {key: None for key in self.date_list}
-        hpis = {key: None for key in self.date_list}
+        hpn  = {key: None for key in self.sw_date_list}
+        hps  = {key: None for key in self.sw_date_list}
+        hpin = {key: None for key in self.sw_date_list}
+        hpis = {key: None for key in self.sw_date_list}
 
-        days = list(set([datetime(dt.year, dt.month, dt.day) for dt in self.date_list]))
+        days = list(set([datetime(dt.year, dt.month, dt.day) for dt in self.sw_date_list]))
 
         for day in days:
             try:
@@ -171,21 +174,21 @@ class InputParameters(object):
                     lines = list(filter(lambda s: not s.startswith("#") ,f.readlines()))
                 for line in lines:
                     split = line.split()
-                    dt = datetime.strptime("{}{}".format(split[0],split[1]),"%Y-%m-%d%H:%M")
-                    hpn[dt] = float(split[2])
-                    hps[dt] = float(split[3])
+                    dt = datetime.strptime("{}{}".format(split[0],split[1]),"%Y-%m-%d%H:%M") + timedelta(minutes=L1_DELAY)
+                    hpn[dt] = float(split[-2])
+                    hps[dt] = float(split[-1])
             except:
                 pass
 
-        hpn  = self.linear_int_missing_vals(hpn,  self.hpn.backwards_search)
-        hps  = self.linear_int_missing_vals(hps,  self.hps.backwards_search)
+        hpn  = self.linear_int_missing_vals(hpn,  self.hpn.backwards_search, True)
+        hps  = self.linear_int_missing_vals(hps,  self.hps.backwards_search, True)
 
         # now backfill with all available data
-        for k in self.date_list:
+        for k in self.sw_date_list:
             self.hpn.dict[k]  = hpn[k]
             self.hps.dict[k]  = hps[k]
-            self.hpin.dict[k] = hpi_from_gw(hpn[k])
-            self.hpis.dict[k] = hpi_from_gw(hps[k])
+            self.hpin.dict[k] = hpi_from_gw(self.hpn.dict[k])
+            self.hpis.dict[k] = hpi_from_gw(self.hps.dict[k])
 
     def parse_wam_input(self, input_directory):
         # search backwards through latest wam_input file for most recent obs/forecast data
@@ -238,7 +241,10 @@ class InputParameters(object):
             self.kp.dict[k]    = kp[k]
             self.kpa.dict[k]   = kpa[k]
 
-    def output(self, outfile):
+    def output(self, outfile, append):
+        mode = 'w'
+        if append:
+            mode = 'a'
         output_fields  = ['Date_Time','F10','Kp','F10Flag','KpFlag','F10_41dAvg','24HrKpAvg',\
                           'NHemiPow','NHemiPowIdx','SHemiPow','SHemiPowIdx','SW_Bt','SW_Angle','SW_Velocity','SW_Bz','SW_Den']
         header_formats = ['{:<20}','{:>12}','{:>12}','{:>12}','{:>12}','{:>12}','{:>12}',\
@@ -248,14 +254,15 @@ class InputParameters(object):
         fields = lambda k: [k.strftime(WAM_INPUT_FMT),self.f107.dict[k],self.kp.dict[k],'2','1',self.f107d.dict[k],\
                             self.kpa.dict[k],self.hpn.dict[k],self.hpin.dict[k],self.hps.dict[k],self.hpis.dict[k],\
                             self.swbt.dict[k],self.swang.dict[k],self.swvel.dict[k],self.swbz.dict[k],self.swden.dict[k]]
-        with open(outfile,'w') as f:
-            f.write('Issue Date          {}\n'.format(datetime.now().strftime(WAM_INPUT_FMT)))
-            f.write('Flags:  0=Forecast, 1=Estimated, 2=Observed \n\n')
-            for fmt, name in zip(header_formats,output_fields):
-                f.write(fmt.format(name))
-            f.write('{}\n'.format('-'*(12*len(output_fields)+8)))
+        with open(outfile, mode) as f:
+            if not append:
+                f.write('Issue Date          {}\n'.format(datetime.now().strftime(WAM_INPUT_FMT)))
+                f.write('Flags:  0=Forecast, 1=Estimated, 2=Observed \n\n')
+                for fmt, name in zip(header_formats,output_fields):
+                    f.write(fmt.format(name))
+                f.write('{}\n'.format('-'*(12*len(output_fields)+8)))
             for date in self.date_list:
-                for fmt, field in zip(output_formats,fields(date)):
+                for fmt, field in zip(output_formats, fields(date)):
                     f.write(fmt.format(field))
 
 def main():
@@ -267,6 +274,7 @@ def main():
     parser.add_argument('-d', '--duration',   help='duration (mins) of run',   type=int, default=24*60)
     parser.add_argument('-p', '--path',       help='path to input parameters', type=str, default=DEFAULT_PATH)
     parser.add_argument('-o', '--output',     help='full path to output file', type=str, default=DEFAULT_NAME)
+    parser.add_argument('-a', '--append',     help='clobbers and writes header if false', default=False, action='store_true')
     args = parser.parse_args()
 
     start_date = datetime.strptime(args.start_date,"%Y%m%d%H%M")
@@ -276,7 +284,7 @@ def main():
         ip.parse_wam_input(args.path)
         ip.parse_geospace_input(args.path)
         ip.parse_aurora_power(args.path)
-        ip.output(args.output)
+        ip.output(args.output, args.append)
     except Exception as e:
         print(e)
         pass
