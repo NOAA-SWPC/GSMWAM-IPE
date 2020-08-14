@@ -1157,23 +1157,7 @@ if [ $IDEA = .true. ]; then
   export END_TIME=$((IPEFMAX+$START_UT_SEC))
   export MSIS_TIME_STEP=${MSIS_TIME_STEP:-900}
   if [ $INPUT_PARAMETERS = realtime ] ; then
-    # copy in xml kp/f107
-    XML_HOUR=`printf %02d $((10#$INI_HOUR / 3 * 3))` # 00 > 00, 01 > 00, 02 > 00, 03 > 03, etc.
-    if [ -e $WAMINDIR/wam_input_new-${INI_YEAR}${INI_MONTH}${INI_DAY}T${XML_HOUR}15.xml ] ; then # try new format
-      ${NLN} $WAMINDIR/wam_input_new-${INI_YEAR}${INI_MONTH}${INI_DAY}T${XML_HOUR}15.xml ./wam_input2.xsd
-      $BASE_NEMS/../scripts/parse_f107_xml/parse.py -s `$NDATE -36 $FDATE` -d $((36+ 10#$FHMAX - 10#$FHINI))
-      ${NLN} $DATA/wam_input.asc $DATA/wam_input_f107_kp.txt
-    elif [ -e $WAMINDIR/wam_input-${INI_YEAR}${INI_MONTH}${INI_DAY}T${XML_HOUR}15.xml ] ; then # then go old format
-      ${NLN} $WAMINDIR/wam_input-${INI_YEAR}${INI_MONTH}${INI_DAY}T${XML_HOUR}15.xml ./wam_input2.xsd
-      $BASE_NEMS/../scripts/parse_f107_xml/parse.py -s `$NDATE -36 $FDATE` -d $((36+ 10#$FHMAX - 10#$FHINI))
-      ${NLN} $DATA/wam_input.asc $DATA/wam_input_f107_kp.txt
-    else
-      if [ -e $COMOUT/wam_input_f107_kp.txt ] ; then
-        ${NCP} $COMOUT/wam_input_f107_kp.txt ${DATA}
-      else
-        echo "failed, no f107 file" ; exit 1
-      fi
-    fi
+    $BASE_NEMS/../scripts/interpolate_input_parameters/parse_realtime.py -s `$NDATE -36 $FDATE` -d $((60*(36+ 10#$FHMAX - 10#$FHINI))) -p $REALTIME_PARAMETER_PATH
   else
     # work from the database
     echo "$FIX_F107"   >> temp_fix
@@ -1236,29 +1220,29 @@ fi # IDEA
 if [[ $DATAPOLL = "YES" ]] ; then
   if [[ $WAM_IPE_COUPLING = .true. ]] ; then
     if [[ $SWIO = .true. ]] ; then
-      NEMS_CONF = ${NEMS_CONF:-$PARMDIR/nems.configure.WAM-IPE-POLL_io
+      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.WAM-IPE-POLL_io}
     else
-      NEMS_CONF = ${NEMS_CONF:-$PARMDIR/nems.configure.WAM-IPE-POLL
+      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.WAM-IPE-POLL}
     fi
   else # standaloneWAM
     if [[ $SWIO = .true. ]] ; then
-      NEMS_CONF = ${NEMS_CONF:-$PARMDIR/nems.configure.standaloneWAM-POLL_io
+      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.standaloneWAM-POLL_io}
     else
-      NEMS_CONF = ${NEMS_CONF:-$PARMDIR/nems.configure.standaloneWAM-POLL
+      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.standaloneWAM-POLL}
     fi
   fi
 else
   if [[ $WAM_IPE_COUPLING = .true. ]] ; then
     if [[ $SWIO = .true. ]] ; then
-      NEMS_CONF = ${NEMS_CONF:-$PARMDIR/nems.configure.WAM-IPE_io
+      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.WAM-IPE_io}
     else
-      NEMS_CONF = ${NEMS_CONF:-$PARMDIR/nems.configure.WAM-IPE
+      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.WAM-IPE}
     fi
   else # standaloneWAM
     if [[ $SWIO = .true. ]] ; then
-      NEMS_CONF = ${NEMS_CONF:-$PARMDIR/nems.configure.standaloneWAM_io
+      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.standaloneWAM_io}
     else
-      NEMS_CONF = ${NEMS_CONF:-$PARMDIR/nems.configure.standaloneWAM
+      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.standaloneWAM}
     fi
   fi
 fi
