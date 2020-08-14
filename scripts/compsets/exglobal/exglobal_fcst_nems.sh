@@ -1233,19 +1233,37 @@ if [ $IDEA = .true. ]; then
 
 fi # IDEA
 
-if [[ $WAM_IPE_COUPLING = .true. ]] ; then
-  if [[ $SWIO = .true. ]] ; then
-    envsubst < $PARMDIR/nems.configure.WAM-IPE_io       > $DATA/nems.configure
-  else
-    envsubst < $PARMDIR/nems.configure.WAM-IPE          > $DATA/nems.configure
+if [[ $DATAPOLL = "YES" ]] ; then
+  if [[ $WAM_IPE_COUPLING = .true. ]] ; then
+    if [[ $SWIO = .true. ]] ; then
+      NEMS_CONF = ${NEMS_CONF:-$PARMDIR/nems.configure.WAM-IPE-POLL_io
+    else
+      NEMS_CONF = ${NEMS_CONF:-$PARMDIR/nems.configure.WAM-IPE-POLL
+    fi
+  else # standaloneWAM
+    if [[ $SWIO = .true. ]] ; then
+      NEMS_CONF = ${NEMS_CONF:-$PARMDIR/nems.configure.standaloneWAM-POLL_io
+    else
+      NEMS_CONF = ${NEMS_CONF:-$PARMDIR/nems.configure.standaloneWAM-POLL
+    fi
   fi
-else # standaloneWAM
-  if [[ $SWIO = .true. ]] ; then
-    envsubst < $PARMDIR/nems.configure.standaloneWAM_io > $DATA/nems.configure
-  else
-    envsubst < $PARMDIR/nems.configure.standaloneWAM    > $DATA/nems.configure
+else
+  if [[ $WAM_IPE_COUPLING = .true. ]] ; then
+    if [[ $SWIO = .true. ]] ; then
+      NEMS_CONF = ${NEMS_CONF:-$PARMDIR/nems.configure.WAM-IPE_io
+    else
+      NEMS_CONF = ${NEMS_CONF:-$PARMDIR/nems.configure.WAM-IPE
+    fi
+  else # standaloneWAM
+    if [[ $SWIO = .true. ]] ; then
+      NEMS_CONF = ${NEMS_CONF:-$PARMDIR/nems.configure.standaloneWAM_io
+    else
+      NEMS_CONF = ${NEMS_CONF:-$PARMDIR/nems.configure.standaloneWAM
+    fi
   fi
 fi
+
+envsubst < $NEMS_CONF > $DATA/nems.configure
 
 if [[ $NEMS = .true. ]] ; then
   export dyncore=${dyncore:-gfs}
