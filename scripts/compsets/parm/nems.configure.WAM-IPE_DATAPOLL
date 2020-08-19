@@ -1,0 +1,59 @@
+#############################################
+####  NEMS Run-Time Configuration File  #####
+#############################################
+# EARTH #
+EARTH_component_list: MED ATM IPM DAT
+EARTH_attributes::
+  Verbosity = max
+::
+
+# MED #
+MED_model:                      $med_model
+MED_petlist_bounds:             $med_petlist_bounds
+MED_attributes::
+  Verbosity = max
+  DumpFields = false
+  DumpRHs = false
+::
+
+# ATM #
+ATM_model:                      wam
+ATM_petlist_bounds:             $atm_petlist_bounds
+ATM_attributes::
+  Verbosity = max
+::
+
+# IPM #
+IPM_model:                      ipe
+IPM_petlist_bounds:             $ipm_petlist_bounds
+IPM_attributes::
+  Verbosity = max
+::
+
+# DAT #
+DAT_model:                      datapoll
+DAT_petlist_bounds:             $dat_petlist_bounds
+DAT_attributes::
+  Verbosity = max
+  pollDir = $data_poll_dir
+  pollSec = $data_poll_interval
+  pollMax = $data_poll_max
+::
+
+# Run Sequence #
+runSeq::
+  @$data_interval_sec
+    @$coupling_interval_slow_sec
+      ATM -> MED :remapMethod=redist
+      MED
+      MED -> IPM :remapMethod=redist
+      @$coupling_interval_fast_sec
+        ATM
+      @
+      IPM
+    @
+    DAT
+  @
+::
+EOF
+

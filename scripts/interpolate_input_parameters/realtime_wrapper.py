@@ -7,10 +7,12 @@ from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 SLEEP_TIME = 60
 
 def touch(dt):
-    pass
+    with open(dt.strftime("%Y%m%d_%H%M%S.lock"), "w") as f:
+        pass
 
 def proceed(dt):
-    return (datetime.now() - dt).seconds // 60 >= prt.MAX_WAIT
+    tdelta = datetime.now() - dt
+    return (tdelta.days * (24*60*60) + tdelta.seconds) // 60 >= prt.MAX_WAIT
 
 def latest_date(path):
     sw_search = '{}/*/swpc/geospace_input*.xml'.format(path)
@@ -49,6 +51,7 @@ def main():
     parser.add_argument('-d', '--duration',   help='duration (mins) of each segment',   type=int, default=15)
     parser.add_argument('-p', '--path',       help='path to input parameters', type=str, default=prt.DEFAULT_PATH)
     parser.add_argument('-o', '--output',     help='full path to output file', type=str, default=prt.DEFAULT_NAME)
+
     args = parser.parse_args()
 
     end_date = datetime.strptime(args.end_date,'%Y%m%d%H%M')
