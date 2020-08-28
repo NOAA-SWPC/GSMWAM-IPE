@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import parse_realtime as prt
 from datetime import datetime, timedelta
 from time import sleep
