@@ -24,7 +24,7 @@ def hpi_from_gw(gw):
     return '10'
 
 def swbt_calc(swbz,swby,swbx=0):
-  return math.sqrt(swbz**2+swby**2+swbx**2)
+  return numpy.sqrt(swbz**2+swby**2+swbx**2)
 
 def swden_calc(): # this isn't used?
   return 5.0
@@ -33,9 +33,8 @@ def swvel_calc(kp):
   return 317.0+55.84*kp-2.71*kp**2
 
 def swang_calc(by,bz):
-  ang = math.atan2(by,bz)/math.pi*180
-  if ang < 0: ang+= 360
-  return ang
+  ang = numpy.arctan2(by,bz)/math.pi*180
+  return (360 + ang) * (ang < 0) + ang*(ang > 0)
 
 def swby_calc():
   return 0.0

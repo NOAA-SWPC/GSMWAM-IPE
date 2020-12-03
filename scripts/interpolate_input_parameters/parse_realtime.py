@@ -11,6 +11,7 @@ from math import exp
 import glob
 from matplotlib import pyplot as plt
 from collections import OrderedDict as od
+from netCDF4 import Dataset
 
 # interpolate linearly between good values, only use decay on
 # forecasted values
@@ -78,10 +79,27 @@ class key_dependent_dict(defaultdict):
         return ret
 
 class InputParameters(object):
-    def __init__(self, start_date, mins, path, outfile, append):
+    _lookup_table = [   0,   4,   5,   6,   7,   9,  12,  15,  18,  22,
+                       27,  32,  39,  48,  56,  67,  80,  94, 111, 132,
+                      154, 179, 207, 236, 300, 400, 999 ]
+
+    _var_names = [ 'f107', 'kp', 'f107d', 'kpa', 'nhp', 'nhpi', 'shp', 'shpi', 'swbt',
+                   'swang', 'swvel', 'swbz', 'swden', 'ap', 'apa' ]
+    _var_types = [ 'f4', 'f4', 'f4', 'f4', 'f4', 'i2', 'f4', 'i2', 'f4',
+                   'f4', 'f4', 'f4', 'f4', 'f4', 'f4' ]
+    _var_long_names = [ '10.7cm Solar Radio Flux' , 'Kp Index', '41-Day F10.7 Average', '24hr Kp Average',
+                        'Northern Hemispheric Power', 'Northern Hemispheric Power Index',
+                        'Southern Hemispheric Power', 'Southern Hemispheric Power Index',
+                        'IMF Total B Strength', 'Solar Wind Angle', 'Solar Wind Velocity',
+                        'IMF Bz Strength', 'Solar Wind Density', 'Ap Index', '24hr Ap Average' ]
+    _var_units = [ 'sfu', None, 'sfu', None, 'GW', None, 'GW', None,
+                   'nT', 'degrees', 'm/s', 'nT', 'cm^-3', None, None ]
+
+    def __init__(self, start_date, mins, path, outfile, append, coupled):
         self.start_date = start_date
         self.date_list   = [start_date + timedelta(minutes=i-SW_DATE_BACKWARDS) for i in range(mins+SW_DATE_BACKWARDS+MAX_WAIT)]
         self.output_list = [start_date + timedelta(minutes=i) for i in range(mins)]
+
         self.f107d = InputParameter(lambda x: F107_MIN) # 'self_avg'
         self.f107  = InputParameter(lambda x: F107_MIN) # np.nanmean(self.f107d.values())
         self.kpa   = InputParameter(lambda x: KP_RELAX)
@@ -102,9 +120,11 @@ class InputParameters(object):
         self.hpin  = InputParameter(lambda x: hpi_from_gw(self.hpn.dict[x]))
         self.hps   = InputParameter(lambda x: hemi_pow_calc(self.kp.dict[x]))
         self.hpis  = InputParameter(lambda x: hpi_from_gw(self.hps.dict[x]))
-        self.path  = path
+
+        self.path    = path
         self.outfile = outfile
-        self.append = append
+        self.append  = append
+        self.coupled = coupled
 
     def linear_int_missing_vals(self, mydict, relax_func, cutoff=False):
         try:
@@ -121,6 +141,23 @@ class InputParameters(object):
         except:
             b = []
         return key_dependent_dict(relax_func, zip(sorted_keys,b))
+
+    def ap_from_kp(self):
+
+      ap  = self.kp.dict.copy()
+      apd = self.kpa.dict.copy()
+
+      for k,v in ap.items():
+          lookup = v*3
+          remainder = lookup - int(lookup)
+          ap[k]  = (1 - remainder) * self._lookup_table[int(lookup)] + \
+                        remainder  * self._lookup_table[int(lookup) + 1]
+      for k,v in apd.items():
+          lookup = v*3
+          remainder = lookup - int(lookup)
+          apd[k] = (1 - remainder) * self._lookup_table[int(lookup)] + \
+                        remainder  * self._lookup_table[int(lookup) + 1]
+      return ap, apd
 
     def parse_geospace_input(self):
         swbz  = self.swbz.dict
@@ -291,6 +328,58 @@ class InputParameters(object):
                 for fmt, field in zip(output_formats, fields(date)):
                     f.write(fmt.format(field))
 
+    def netcdf_output(self):
+        _mode = 'w'
+        if self.append:
+            _mode = 'a'
+
+        ap, apd = self.ap_from_kp()
+
+        _fields = lambda k: [self.f107.dict[k], self.kp.dict[k], self.f107d.dict[k], self.kpa.dict[k],
+                             self.hpn.dict[k], self.hpin.dict[k], self.hps.dict[k], self.hpis.dict[k],
+                             self.swbt.dict[k], self.swang.dict[k], self.swveo.dict[k], self.swbzo.dict[k],
+                             self.swdeo.dict[k], ap[k], apd[k]]
+        # Open
+        _o = Dataset(self.outfile, _mode, format='NETCDF3_64BIT_OFFSET')
+        _vars = []
+
+        if self.coupled:
+            _o.skip = 36*60
+        else:
+            _o.skip = 0
+        _o.ifp_interval = 60
+
+        if not self.append:
+            # Dimensions
+            t_dim = _o.createDimension('time',  None)
+
+            t_var = _o.createVariable('time', 'i4', ('time',))
+#            t_var.long_name = 'Timesteps'
+            t_var.units     = 'minutes'
+
+            # Variables
+            for i in range(len(self._var_names)):
+                print(self._var_names[i])
+                _vars.append(_o.createVariable(self._var_names[i], self._var_types[i], ('time',)))
+#                _vars[-1].long_name = self._var_long_names[i]
+                if self._var_units[i] is not None:
+                    _vars[-1].units = self._var_units[i]
+
+        else:
+            for i in range(len(self._var_names)):
+                _vars.append(_o.variables[self._var_names[i]])
+
+        # Output
+        _start = len(t_var[:])
+        _len = len(self.output_list)
+        _output_fields = []
+        for date in self.output_list:
+            _output_fields.append(_fields(date))
+        _output_arr = np.asarray(_output_fields)
+        for i, var in enumerate(_vars):
+            var[_start:_start+_len] = _output_arr[:,i]
+        _o.close()
+
 def main():
     parser = ArgumentParser( \
                description='Parse KP, F10.7, 24hr average Kp, and hemispheric power files into binned data', \
@@ -301,14 +390,15 @@ def main():
     parser.add_argument('-p', '--path',       help='path to input parameters', type=str, default=DEFAULT_PATH)
     parser.add_argument('-o', '--output',     help='full path to output file', type=str, default=DEFAULT_NAME)
     parser.add_argument('-a', '--append',     help='clobbers and writes header if false', default=False, action='store_true')
+    parser.add_argument('-c', '--coupled',    help='setup for coupled model run',         default=False, action='store_true')
     args = parser.parse_args()
 
     start_date = datetime.strptime(args.start_date,'%Y%m%d%H%M')
 
-    ip = InputParameters(start_date, args.duration, args.path, args.output, args.append)
+    ip = InputParameters(start_date, args.duration, args.path, args.output, args.append, args.coupled)
     try:
         ip.parse()
-        ip.output()
+        ip.netcdf_output()
     except Exception as e:
         print(e)
         pass

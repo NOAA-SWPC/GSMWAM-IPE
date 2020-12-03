@@ -61,8 +61,14 @@ module load esmf/8.0.0
 module load szip/2.1
 
 module use -a /scratch1/NCEPDEV/swpc/Raffaele.Montuoro/swpc.spacepara/modulefiles
+module use /scratch1/NCEPDEV/swpc/Adam.Kubaryk/modulefiles
 module load pnetcdf/1.12.1
-module load comio/0.0.3
+module load comio/0.0.6
+
+
+## python
+module use -a /scratch1/NCEPDEV/swpc/Adam.Kubaryk/modulefiles
+module load anaconda/anaconda3-2019.10
 
 ##
 ## use workaround to prevent possible runtime failures with Intel MPI

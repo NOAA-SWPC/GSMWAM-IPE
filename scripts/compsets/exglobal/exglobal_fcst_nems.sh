@@ -398,11 +398,6 @@ if [[ $VERBOSE = YES ]] ; then
   set -x
 fi
 #
-module purge
-module use -a $BASEDIR/modulefiles/$BUILD_TARGET
-module load wam-ipe
-module list
-#
 export COMPLIANCECHECK=${COMPLIANCECHECK:-OFF}
 export ESMF_RUNTIME_COMPLIANCECHECK=$COMPLIANCECHECK:depth=4
 #
@@ -1170,7 +1165,7 @@ if [ $IDEA = .true. ]; then
     echo "$FIX_HPI"    >> temp_fix
     $BASE_NEMS/../scripts/interpolate_input_parameters/interpolate_input_parameters.py -d $((36+ 10#$FHMAX - 10#$FHINI)) -s `$NDATE -36 $FDATE` -p $PARAMETER_PATH -m $INPUT_PARAMETERS -f temp_fix
     rm -rf temp_fix
-    if [ ! -e wam_input_f107_kp.txt ] ; then
+    if [ ! -e input_parameters.nc ] ; then
        echo "failed, no f107 file" ; exit 1
     fi
   fi
