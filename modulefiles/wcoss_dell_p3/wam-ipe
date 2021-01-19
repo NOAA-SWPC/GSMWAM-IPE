@@ -19,8 +19,11 @@ module-whatis "loads NEMS GSMWAM-IPE prerequisites on Venus and Mars"
 #module load ips/18.0.5.274
 module load ips/18.0.1.163
 module load impi/18.0.1
-module load NetCDF/4.5.0
+
 module use /gpfs/dell2/swpc/noscrub/Adam.Kubaryk/modulefiles
+module load anaconda/anaconda3-2020.02
+
+module load NetCDF/4.5.0
 module load HDF5-parallel/1.10.1
 module load COMIO/0.0.6
 module load PNetCDF/1.8.1
@@ -45,6 +48,5 @@ module load esmf/8.0.0
 
 # misc
 module use -a /usrx/local/dev/modulefiles
-module load python/2.7.14
 module load prod_util/1.1.3
 module load EnvVars/1.0.2
