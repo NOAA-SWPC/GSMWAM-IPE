@@ -1,6 +1,6 @@
 name: "Pull request documentation"
 on: 
-- pull_request
+  pull_request
 
 jobs:
   docs:
