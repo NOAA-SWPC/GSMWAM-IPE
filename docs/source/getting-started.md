@@ -74,6 +74,8 @@ cp /scratch3/NCEPDEV/swpc/noscrub/refactored_ipe_input_decks/* IPELIB/run/
   - Namelist file used for specifying IPE parameters, including timestep, file IO frequency, and forcing parameters
 ```
 
+(ipe_build)=
+
 ## Building IPE
 
 IPE uses autoconf as it’s make system. To build the code, execute the following from the **IPELIB/** directory, replacing **/path/to/install** with the path where you would like to install IPE binaries and libraries.

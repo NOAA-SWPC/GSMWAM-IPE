@@ -9,6 +9,7 @@ and plasmasphere to provide upper atmosphere physics forecasts.
 maxdepth: 2
 caption: Contents
 ---
+source/quickstart-guide.md
 source/getting-started.md
 source/developer-guide.md
 ```
