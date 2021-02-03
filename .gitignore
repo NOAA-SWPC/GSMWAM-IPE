@@ -1,2 +1,5 @@
 *.mk
 *.pyc
+
+# Sphinx documentation
+docs/_build/
