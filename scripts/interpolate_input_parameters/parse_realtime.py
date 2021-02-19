@@ -32,7 +32,7 @@ DELAY_INTERVAL     = L1_DELAY - GEOSPACE_TIME_GAP # minutes
 TIME_CONSTANT      = 60*5
 MAX_SEARCH_DIST    = 1
 DEFAULT_PATH = '.'
-DEFAULT_NAME = 'wam_input_f107_kp.txt'
+DEFAULT_NAME = 'input_parameters.nc'
 MAX_WAIT = 120 # minutes
 
 def backwards_search(dict,search_time,relax_func):
@@ -366,6 +366,7 @@ class InputParameters(object):
                     _vars[-1].units = self._var_units[i]
 
         else:
+            t_var = _o.variables['time']
             for i in range(len(self._var_names)):
                 _vars.append(_o.variables[self._var_names[i]])
 
@@ -390,7 +391,7 @@ def main():
     parser.add_argument('-p', '--path',       help='path to input parameters', type=str, default=DEFAULT_PATH)
     parser.add_argument('-o', '--output',     help='full path to output file', type=str, default=DEFAULT_NAME)
     parser.add_argument('-a', '--append',     help='clobbers and writes header if false', default=False, action='store_true')
-    parser.add_argument('-c', '--coupled',    help='setup for coupled model run',         default=False, action='store_true')
+    parser.add_argument('-c', '--coupled',    help='setup for coupled model run',         default=True, action='store_true')
     args = parser.parse_args()
 
     start_date = datetime.strptime(args.start_date,'%Y%m%d%H%M')

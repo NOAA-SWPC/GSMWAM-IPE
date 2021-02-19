@@ -1157,7 +1157,15 @@ if [ $IDEA = .true. ]; then
   export END_TIME=$((IPEFMAX+$START_UT_SEC))
   export MSIS_TIME_STEP=${MSIS_TIME_STEP:-900}
   if [ $INPUT_PARAMETERS = realtime ] ; then
-    $BASE_NEMS/../scripts/interpolate_input_parameters/parse_realtime.py -s `$NDATE -36 $FDATE` -d $((60*(36+ 10#$FHMAX - 10#$FHINI))) -p $REALTIME_PARAMETER_PATH
+    $BASE_NEMS/../scripts/interpolate_input_parameters/parse_realtime.py -s $($MDATE -$((36*60)) ${FDATE}00) \
+                                                                         -d $((60*(36+ 10#$FHMAX - 10#$FHINI))) \
+                                                                         -p $DCOM
+  elif [ $INPUT_PARAMETERS = conops2 ] ; then
+    start=$($MDATE -$((36*60)) ${FDATE}00)
+    duration=$((2160+15))
+    $BASE_NEMS/../scripts/interpolate_input_parameters/parse_realtime.py -s $start -d $duration -p $DCOM
+    $BASE_NEMS/../scripts/interpolate_input_parameters/realtime_wrapper.py -e ${SWIO_EDATE:0:8}${SWIO_EDATE:9:4} -p $DCOM -d 15 &
+
   else
     # work from the database
     echo "$FIX_F107"   >> temp_fix
@@ -1220,15 +1228,15 @@ fi # IDEA
 if [[ $DATAPOLL = "YES" ]] ; then
   if [[ $WAM_IPE_COUPLING = .true. ]] ; then
     if [[ $SWIO = .true. ]] ; then
-      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.WAM-IPE-POLL_io}
+      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.WAM-IPE_DATAPOLL_io}
     else
-      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.WAM-IPE-POLL}
+      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.WAM-IPE_DATAPOLL}
     fi
   else # standaloneWAM
     if [[ $SWIO = .true. ]] ; then
-      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.standaloneWAM-POLL_io}
+      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.standaloneWAM_DATAPOLL_io}
     else
-      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.standaloneWAM-POLL}
+      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.standaloneWAM_DATAPOLL}
     fi
   fi
 else

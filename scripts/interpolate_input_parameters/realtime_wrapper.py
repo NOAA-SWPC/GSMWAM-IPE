@@ -36,8 +36,12 @@ def get_sw_date(filename):
 
 def get_hp_date(fp):
     last_line = fp.readlines()[-1].split()
-    return datetime.strptime("{}{}".format(last_line[0],last_line[1]),'%Y-%m-%d%H:%M') + \
-           timedelta(minutes = prt.L1_DELAY)
+    try:
+        return datetime.strptime("{}{}".format(last_line[0],last_line[1]),'%Y-%m-%d%H:%M') + \
+               timedelta(minutes = prt.L1_DELAY)
+    except:
+        return datetime.strptime("{}".format(last_line[0]),'%Y-%m-%d_%H:%M') + \
+               timedelta(minutes = prt.L1_DELAY)
 
 def get_last_date(outfile):
     with open(outfile, 'r') as f:
@@ -48,19 +52,20 @@ def main():
                description='Parse KP, F10.7, 24hr average Kp, and hemispheric power files into binned data', \
                formatter_class=ArgumentDefaultsHelpFormatter \
              )
-    parser.add_argument('-e', '--end_date',   help='end date of run (YYYYMMDDhh)', type=str, default='202006010559')
-    parser.add_argument('-d', '--duration',   help='duration (mins) of each segment',   type=int, default=15)
-    parser.add_argument('-p', '--path',       help='path to input parameters', type=str, default=prt.DEFAULT_PATH)
-    parser.add_argument('-o', '--output',     help='full path to output file', type=str, default=prt.DEFAULT_NAME)
+    parser.add_argument('-c', '--current_date',help='current date of run (YYYYMMDDhhmm)', type=str, default='202102170015')
+    parser.add_argument('-e', '--end_date',    help='end date of run (YYYYMMDDhh)', type=str, default='202006010559')
+    parser.add_argument('-d', '--duration',    help='duration (mins) of each segment',   type=int, default=15)
+    parser.add_argument('-p', '--path',        help='path to input parameters', type=str, default=prt.DEFAULT_PATH)
+    parser.add_argument('-o', '--output',      help='full path to output file', type=str, default=prt.DEFAULT_NAME)
 
     args = parser.parse_args()
 
     end_date = datetime.strptime(args.end_date,'%Y%m%d%H%M')
 
-    current_date = get_last_date(args.output) + timedelta(minutes=1)
+    current_date = datetime.strptime(args.current_date,'%Y%m%d%H%M')
     target_date = current_date + timedelta(minutes=args.duration)
 
-    ip = prt.InputParameters(current_date, args.duration, args.path, args.output, True)
+    ip = prt.InputParameters(current_date, args.duration, args.path, args.output, True, True)
     ip.parse()
 
     while current_date < end_date:
@@ -71,7 +76,7 @@ def main():
                 # parse
                 ip.parse()
                 # write
-                ip.output()
+                ip.netcdf_output()
                 # touch and advance
                 touch(target_date)                
                 current_date += timedelta(minutes=args.duration)
