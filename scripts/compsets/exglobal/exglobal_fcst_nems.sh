@@ -1203,6 +1203,7 @@ if [ $IDEA = .true. ]; then
     export READ_APEX_NEUTRALS=${READ_APEX_NEUTRALS:-"T"}
     export mesh_fill=${mesh_fill:-"1"}
     export DYNAMO_EFIELD=${DYNAMO_EFIELD:-"T"}
+    export COLFAC=${COLFAC:-1.3}
 
     # IPE fix files
     #${NLN} $BASE_NEMS/../IPELIB/run/coeff* ${DATA}
