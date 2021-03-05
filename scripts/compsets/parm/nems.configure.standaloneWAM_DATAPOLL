@@ -1,0 +1,37 @@
+#############################################
+####  NEMS Run-Time Configuration File  #####
+#############################################
+# EARTH #
+EARTH_component_list: ATM DAT
+EARTH_attributes::
+  Verbosity = max
+::
+
+# ATM #
+ATM_model:                      wam
+ATM_petlist_bounds:             $atm_petlist_bounds
+ATM_attributes::
+  Verbosity = max
+::
+
+# DAT #
+DAT_model:                      datapoll
+DAT_petlist_bounds:             $dat_petlist_bounds
+DAT_attributes::
+  Verbosity = max
+  pollDir = $datapoll_dir
+  pollSec = $datapoll_interval
+  pollMax = $datapoll_max
+::
+
+# Run Sequence #
+runSeq::
+  @$datapoll_interval_sec
+    @$coupling_interval_fast_sec
+      ATM
+    @
+    DAT
+  @
+::
+EOF
+

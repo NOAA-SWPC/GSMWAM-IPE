@@ -1,0 +1,5 @@
+# Coupled WAM-IPE with SWIO and DATAPOLL
+#
+## NEMS Application Builder file
+
+COMPONENTS=( WAM IPE SWIO DATAPOLL )

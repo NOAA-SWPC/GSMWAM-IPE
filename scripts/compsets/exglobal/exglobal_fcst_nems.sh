@@ -398,11 +398,11 @@ if [[ $VERBOSE = YES ]] ; then
   set -x
 fi
 #
-module purge
-module use -a $BASEDIR/modulefiles/$BUILD_TARGET
-module load wam-ipe
+module purge	
+module use -a $BASEDIR/modulefiles/$BUILD_TARGET	
+module load wam-ipe	
 module list
-#
+
 export COMPLIANCECHECK=${COMPLIANCECHECK:-OFF}
 export ESMF_RUNTIME_COMPLIANCECHECK=$COMPLIANCECHECK:depth=4
 #
@@ -1157,23 +1157,15 @@ if [ $IDEA = .true. ]; then
   export END_TIME=$((IPEFMAX+$START_UT_SEC))
   export MSIS_TIME_STEP=${MSIS_TIME_STEP:-900}
   if [ $INPUT_PARAMETERS = realtime ] ; then
-    # copy in xml kp/f107
-    XML_HOUR=`printf %02d $((10#$INI_HOUR / 3 * 3))` # 00 > 00, 01 > 00, 02 > 00, 03 > 03, etc.
-    if [ -e $WAMINDIR/wam_input_new-${INI_YEAR}${INI_MONTH}${INI_DAY}T${XML_HOUR}15.xml ] ; then # try new format
-      ${NLN} $WAMINDIR/wam_input_new-${INI_YEAR}${INI_MONTH}${INI_DAY}T${XML_HOUR}15.xml ./wam_input2.xsd
-      $BASE_NEMS/../scripts/parse_f107_xml/parse.py -s `$NDATE -36 $FDATE` -d $((36+ 10#$FHMAX - 10#$FHINI))
-      ${NLN} $DATA/wam_input.asc $DATA/wam_input_f107_kp.txt
-    elif [ -e $WAMINDIR/wam_input-${INI_YEAR}${INI_MONTH}${INI_DAY}T${XML_HOUR}15.xml ] ; then # then go old format
-      ${NLN} $WAMINDIR/wam_input-${INI_YEAR}${INI_MONTH}${INI_DAY}T${XML_HOUR}15.xml ./wam_input2.xsd
-      $BASE_NEMS/../scripts/parse_f107_xml/parse.py -s `$NDATE -36 $FDATE` -d $((36+ 10#$FHMAX - 10#$FHINI))
-      ${NLN} $DATA/wam_input.asc $DATA/wam_input_f107_kp.txt
-    else
-      if [ -e $COMOUT/wam_input_f107_kp.txt ] ; then
-        ${NCP} $COMOUT/wam_input_f107_kp.txt ${DATA}
-      else
-        echo "failed, no f107 file" ; exit 1
-      fi
-    fi
+    $BASE_NEMS/../scripts/interpolate_input_parameters/parse_realtime.py -s $($MDATE -$((36*60)) ${FDATE}00) \
+                                                                         -d $((60*(36+ 10#$FHMAX - 10#$FHINI))) \
+                                                                         -p $DCOM
+  elif [ $INPUT_PARAMETERS = conops2 ] ; then
+    start=$($MDATE -$((36*60)) ${FDATE}00)
+    duration=$((2160+15))
+    $BASE_NEMS/../scripts/interpolate_input_parameters/parse_realtime.py -s $start -d $duration -p $DCOM
+    $BASE_NEMS/../scripts/interpolate_input_parameters/realtime_wrapper.py -e ${SWIO_EDATE:0:8}${SWIO_EDATE:9:4} -p $DCOM -d 15 &
+
   else
     # work from the database
     echo "$FIX_F107"   >> temp_fix
@@ -1186,7 +1178,7 @@ if [ $IDEA = .true. ]; then
     echo "$FIX_HPI"    >> temp_fix
     $BASE_NEMS/../scripts/interpolate_input_parameters/interpolate_input_parameters.py -d $((36+ 10#$FHMAX - 10#$FHINI)) -s `$NDATE -36 $FDATE` -p $PARAMETER_PATH -m $INPUT_PARAMETERS -f temp_fix
     rm -rf temp_fix
-    if [ ! -e wam_input_f107_kp.txt ] ; then
+    if [ ! -e input_parameters.nc ] ; then
        echo "failed, no f107 file" ; exit 1
     fi
   fi
@@ -1211,6 +1203,7 @@ if [ $IDEA = .true. ]; then
     export READ_APEX_NEUTRALS=${READ_APEX_NEUTRALS:-"T"}
     export mesh_fill=${mesh_fill:-"1"}
     export DYNAMO_EFIELD=${DYNAMO_EFIELD:-"T"}
+    export COLFAC=${COLFAC:-1.3}
 
     # IPE fix files
     #${NLN} $BASE_NEMS/../IPELIB/run/coeff* ${DATA}
@@ -1233,19 +1226,37 @@ if [ $IDEA = .true. ]; then
 
 fi # IDEA
 
-if [[ $WAM_IPE_COUPLING = .true. ]] ; then
-  if [[ $SWIO = .true. ]] ; then
-    envsubst < $PARMDIR/nems.configure.WAM-IPE_io       > $DATA/nems.configure
-  else
-    envsubst < $PARMDIR/nems.configure.WAM-IPE          > $DATA/nems.configure
+if [[ $DATAPOLL = "YES" ]] ; then
+  if [[ $WAM_IPE_COUPLING = .true. ]] ; then
+    if [[ $SWIO = .true. ]] ; then
+      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.WAM-IPE_DATAPOLL_io}
+    else
+      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.WAM-IPE_DATAPOLL}
+    fi
+  else # standaloneWAM
+    if [[ $SWIO = .true. ]] ; then
+      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.standaloneWAM_DATAPOLL_io}
+    else
+      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.standaloneWAM_DATAPOLL}
+    fi
   fi
-else # standaloneWAM
-  if [[ $SWIO = .true. ]] ; then
-    envsubst < $PARMDIR/nems.configure.standaloneWAM_io > $DATA/nems.configure
-  else
-    envsubst < $PARMDIR/nems.configure.standaloneWAM    > $DATA/nems.configure
+else
+  if [[ $WAM_IPE_COUPLING = .true. ]] ; then
+    if [[ $SWIO = .true. ]] ; then
+      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.WAM-IPE_io}
+    else
+      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.WAM-IPE}
+    fi
+  else # standaloneWAM
+    if [[ $SWIO = .true. ]] ; then
+      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.standaloneWAM_io}
+    else
+      NEMS_CONF=${NEMS_CONF:-$PARMDIR/nems.configure.standaloneWAM}
+    fi
   fi
 fi
+
+envsubst < $NEMS_CONF > $DATA/nems.configure
 
 if [[ $NEMS = .true. ]] ; then
   export dyncore=${dyncore:-gfs}

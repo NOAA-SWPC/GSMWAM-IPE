@@ -4,6 +4,7 @@ export SCRIPTSDIR=`pwd`/..
 export COMPSETDIR=`pwd`
 export CONFIGDIR=`pwd`/config
 export PARMDIR=`pwd`/parm
+export BASEDIR=${BASEDIR:-`pwd`/../..} # folder containing IPELIB, NEMS, etc.
 
 # run detect_machine, will exit if machine is unknown or config file doesn't exist for machine
 . $CONFIGDIR/detect_machine.sh
