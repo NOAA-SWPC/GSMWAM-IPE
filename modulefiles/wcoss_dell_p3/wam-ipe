@@ -22,7 +22,7 @@ module load impi/18.0.1
 module load NetCDF/4.5.0
 module use /gpfs/dell2/swpc/noscrub/Adam.Kubaryk/modulefiles
 module load HDF5-parallel/1.10.1
-module load COMIO/0.0.5
+module load COMIO/0.0.7
 module load PNetCDF/1.8.1
 module load cmake/3.10.0
 module load lsf/10.1
