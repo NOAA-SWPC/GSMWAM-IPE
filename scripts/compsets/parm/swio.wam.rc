@@ -36,6 +36,39 @@ output_fields::
     thermosphere_mean_molecular_mass
 ::
 #
+#  Imported masking field
+#
+import_mask_field: temp_neutral 0.0 -99999.
+#
+#  Computed fields
+#
+#  Use SWIO internal calculator to compute additional
+#  output fields from input ones, according to the syntax
+#  below:
+#
+#  <function_name> <input_field1> ... <input_fieldN> [<input_parm1> ... <input_parmL>] <output_field1> <output_units1> ... <output_fieldM> <output_unitsM> <scaling_factor>
+#
+#  Available functions are:
+#  - column_integrate
+#  - column_max_point
+#  - column_max_region
+#  - column_interpolate
+#
+#  Note that <scaling_factor> is optional as it may or may not be used depending on the function
+#
+compute_fields::
+    column_interpolate  thermosphere_mass_density    height    400000.    iss_mass_density    "kg m-3"
+    column_o_n2_ratio   O_Density    N2_Density    temp_neutral    height    2.e+21    o_n2_ratio    "1"
+::
+#
+# Output create mode
+#
+# Supported modes are: clobber (default), preserve-links
+# - clobber       : overwrite existing files (default)
+# - preserve-links: do not overwrite linked output targets
+#
+output_create_mode: preserve-links
+#
 # Output file format.
 #
 # Choose from:
