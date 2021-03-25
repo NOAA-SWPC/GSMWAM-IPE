@@ -1206,6 +1206,12 @@ if [ $IDEA = .true. ]; then
     export mesh_fill=${mesh_fill:-"1"}
     export DYNAMO_EFIELD=${DYNAMO_EFIELD:-"T"}
     export COLFAC=${COLFAC:-1.3}
+    export OFFSET1_DEG=${OFFSET1_DEG:-5.0}
+    export OFFSET2_DEG=${OFFSET2_DEGi:-20.0}
+    export POTENTIAL_MODEL=${POTENTIAL_MODEL:-2}
+    export HPEQ=${HPEQ:-0.0}
+    export TRANSPORT_HIGHLAT_LP=${TRANSPORT_HIGHLAT_LP:-30}
+    export PERP_TRANSPORT_MAX_LP=${PERP_TRANSPORT_MAX_LP:-151}
 
     # IPE fix files
     #${NLN} $BASE_NEMS/../IPELIB/run/coeff* ${DATA}
