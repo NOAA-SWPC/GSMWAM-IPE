@@ -282,10 +282,10 @@ class InputParameters(object):
                     pass
         except:
             print('WARNING: no valid wam_input file found!')
-            f107  = self.f107.dict()
-            f107d = self.f107d.dict()
-            kp    = self.kp.dict()
-            kpa   = self.kpa.dict()
+            f107  = self.f107.dict
+            f107d = self.f107d.dict
+            kp    = self.kp.dict
+            kpa   = self.kpa.dict
             pass
         # and interpolate them
         f107  = self.linear_int_missing_vals(f107,  self.f107.backwards_search)
