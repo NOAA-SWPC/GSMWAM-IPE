@@ -249,7 +249,7 @@ class InputParameters(object):
 
     def parse_wam_input(self):
         # search backwards through latest wam_input file for most recent obs/forecast data
-        files = glob.glob('{}/*/swpc/wam/wam_input*'.format(self.path))
+        files = glob.glob('{}/????????/swpc/wam/wam_input*'.format(self.path))
         files.sort(reverse=True)
         try:
             for i in range(len(files)):
