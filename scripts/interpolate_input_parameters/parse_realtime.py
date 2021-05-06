@@ -400,6 +400,8 @@ def main():
     try:
         ip.parse()
         ip.netcdf_output()
+        ip.outfile = 'wam_input_f107_kp.txt'
+        ip.output()
     except Exception as e:
         print(e)
         pass
