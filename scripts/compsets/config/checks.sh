@@ -129,7 +129,7 @@ fi
 # check if WAM ICs are in place if GSM running
 [[ $NEMS = .true. ]] && if [ $RESTART = .false. ] ; then # cold start
 	echo "checking for atmospheric/surface initial conditions in ROTDIR: $SEARCH$CDATE"
-	if [[ `find -L $ROTDIR -maxdepth 1 -type f -iname "$SEARCH$CDATE" | wc -l` -lt 2 ]] ; then
+	if [[ `find -L $ROTDIR -maxdepth 1 -type f -iname "$SEARCH$CDATE" | wc -l` -lt 1 ]] ; then
 		echo "   ICs not found in ROTDIR. checking for IC_DIR"
 		if [[ -n $IC_DIR ]] ; then
 			echo "   IC_DIR has been set to $IC_DIR"
@@ -147,18 +147,18 @@ fi
 	# now we check to see that the surface idate&fhour match the atmospheric idate&fhour
 	echo "making sure our ICs match idate and fhour"
 	export ATMIN=`find -L $ROTDIR -maxdepth 1 -type f -iname "$ATM*$CDATE" | head -1`
-	export SFCIN=`find -L $ROTDIR -maxdepth 1 -type f -iname "$SFC*$CDATE" | head -1`
-	if [ $NEMSIO_IN = .true. ] ; then
-		if [ $($NEMSIOGET $ATMIN fhour) != $($NEMSIOGET $SFCIN fhour) ] || \
-		   [ $($NEMSIOGET $ATMIN idate) != $($NEMSIOGET $SFCIN idate) ] ; then
-			echo "   $ATMIN and $SFCIN do not have matching fhour and idate! exiting." ; exit 1
-		fi
-	else
-		if [ $($SIGHDR $ATMIN fhour) != $($SFCHDR $SFCIN fhour) ] || \
-		   [ $($SIGHDR $ATMIN idate) != $($SFCHDR $SFCIN idate) ] ; then
-			echo "   $ATMIN and $SFCIN do not have matching fhour and idate! exiting." ; exit 1
-		fi
-	fi
+	export SFCIN=`find -L $ROTDIR -maxdepth 1 -type f -iname "sfca03*$CDATE" | head -1`
+#	if [ $NEMSIO_IN = .true. ] ; then
+#		if [ $($NEMSIOGET $ATMIN fhour) != $($NEMSIOGET $SFCIN fhour) ] || \
+#		   [ $($NEMSIOGET $ATMIN idate) != $($NEMSIOGET $SFCIN idate) ] ; then
+#			echo "   $ATMIN and $SFCIN do not have matching fhour and idate! exiting." ; exit 1
+#		fi
+#	else
+#		if [ $($SIGHDR $ATMIN fhour) != $($SFCHDR $SFCIN fhour) ] || \
+#		   [ $($SIGHDR $ATMIN idate) != $($SFCHDR $SFCIN idate) ] ; then
+#			echo "   $ATMIN and $SFCIN do not have matching fhour and idate! exiting." ; exit 1
+#		fi
+#	fi
 else # restart conditions
 	echo "checking for atmospheric/surface restart files in RESTARTDIR $RESTARTDIR"
 	NFHOUR_ARR=()
