@@ -16,6 +16,18 @@ from netCDF4 import Dataset
 # implement variable cadence
 # turn the YYYYMMDDHH strings into a class rather than having a mess of functions all over the place
 
+def compare_timestamp(date1,date2):
+  if datetime.datetime.strptime(date1,'%Y%m%d%H') == datetime.datetime.strptime(date2,'%Y-%m-%dT%H:%M:%SZ'):
+    return True
+  else:
+    return False
+
+def output_timestamp(start_date,delta=0):
+  return (datetime.datetime.strptime(start_date,'%Y-%m-%dT%H:%M:%SZ') + datetime.timedelta(minutes=delta)).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+def compare_create(start_date):
+  return datetime.datetime.strptime(start_date,'%Y-%m-%dT%H:%M:%SZ').strftime('%Y%m%d%H')
+
 ### weak failure handling
 
 def failure(fail_point):
@@ -228,7 +240,7 @@ def parse(start_date, end_date, hduration):
 def output_timestamp(start_date,delta=0):
   return (datetime.datetime.strptime(start_date,'%Y%m%d%H') + datetime.timedelta(minutes=delta)).strftime('%Y-%m-%dT%H:%M:%SZ')
 
-def txt_output(file, kp, f107, f107d, kpa, swbt, swangle, swvel, swbz, hemi_pow, hemi_pow_idx, swden, swby, coupled=True):
+def txt_output(file, kp, f107, f107d, kpa, swbt, swangle, swvel, swbz, hemi_pow, hemi_pow_idx, swden, swby, date, coupled=True):
     def running_average(arr):
       vals = np.asarray(arr,dtype='float64')
       output = np.zeros(len(vals)+AVERAGING_INTERVAL,dtype='float64')
@@ -247,7 +259,7 @@ def txt_output(file, kp, f107, f107d, kpa, swbt, swangle, swvel, swbz, hemi_pow,
     swbt  = swbt_calc(swbyo, swbzo, swbxo)
 
     f = open(file,'w')
-    f.write('Issue Date          '+tree.find('issue-date').text+"\n")
+    f.write('Issue Date          \n')
     f.write('Flags:  0=Forecast, 1=Estimated, 2=Observed \n\n')
 
     f.write(" Date_Time                   F10          Kp     F10Flag      KpFlag  F10_41dAvg   24HrKpAvg    NHemiPow NHemiPowIdx    SHemiPow SHemiPowIdx       SW_Bt    SW_Angle SW_Velocity       SW_Bz      SW_Den   \n")
@@ -397,7 +409,7 @@ def run(start_date, duration, output_filename):
   kp, f107, f107d, kp_avg, swbt, swangle, swvel, swden, swbz, hemi_pow, hemi_pow_idx = parse(start_date, end_date, duration)
   swby = swbt * np.sin(swangle*math.pi/180)
   netcdf_output(output_filename, kp, f107, f107d, kp_avg, swbt, swangle, swvel, swbz, hemi_pow, hemi_pow_idx, swden, swby)
-  txt_output('wam_input_f107_kp.txt', kp, f107, f107d, kp_avg, swbt, swangle, swvel, swbz, hemi_pow, hemi_pow_idx, swden, swby)
+  txt_output('wam_input_f107_kp.txt', kp, f107, f107d, kp_avg, swbt, swangle, swvel, swbz, hemi_pow, hemi_pow_idx, swden, swby, get_dates(new_timestamp(start_date,0),end_date))
 
 ### we start below
 
