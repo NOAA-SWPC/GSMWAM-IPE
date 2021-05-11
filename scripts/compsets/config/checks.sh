@@ -76,7 +76,7 @@ if [ $IDEA = .true. ] ; then
 	done
 
 	echo "checking to make sure CDATE is a valid length: $CDATE"
-	if [ ${#CDATE} != 10 ] ; then # y10k problem!
+	if [ ${#CDATE} != 10 -a $MODE != "operational" ] ; then # y10k problem!
 		echo "   $CDATE is ${#CDATE} characters long, needs to be 10 (YYYYMMDDHH)! exiting." ; exit 1
 	fi
 
@@ -125,6 +125,8 @@ if [ -z $RESTARTDIR  ] || [ ! -d $RESTARTDIR ] ; then
         echo "   RESTARTDIR not found. creating $RESTARTDIR"
         mkdir -p $RESTARTDIR
 fi
+
+[[ $MODE = "operational" ]] && . $CONFIGDIR/operational.config && . $CONFIGDIR/coldstart.config
 
 # check if WAM ICs are in place if GSM running
 [[ $NEMS = .true. ]] && if [ $RESTART = .false. ] ; then # cold start
