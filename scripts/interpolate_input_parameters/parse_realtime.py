@@ -79,9 +79,9 @@ class key_dependent_dict(defaultdict):
         return ret
 
 class InputParameters(object):
-    _lookup_table = [   0,   4,   5,   6,   7,   9,  12,  15,  18,  22,
-                       27,  32,  39,  48,  56,  67,  80,  94, 111, 132,
-                      154, 179, 207, 236, 300, 400, 999 ]
+    _lookup_table = [   0,   2,   3,   4,   5,   6,   7,   9,  12,  15,
+                       18,  22,  27,  32,  39,  48,  56,  67,  80,  94,
+                      111, 132, 154, 179, 207, 236, 300, 400, 999 ]
 
     _var_names = [ 'f107', 'kp', 'f107d', 'kpa', 'nhp', 'nhpi', 'shp', 'shpi', 'swbt',
                    'swang', 'swvel', 'swbz', 'swden', 'ap', 'apa' ]
@@ -282,10 +282,10 @@ class InputParameters(object):
                     pass
         except:
             print('WARNING: no valid wam_input file found!')
-            f107  = self.f107.dict()
-            f107d = self.f107d.dict()
-            kp    = self.kp.dict()
-            kpa   = self.kpa.dict()
+            f107  = self.f107.dict
+            f107d = self.f107d.dict
+            kp    = self.kp.dict
+            kpa   = self.kpa.dict
             pass
         # and interpolate them
         f107  = self.linear_int_missing_vals(f107,  self.f107.backwards_search)

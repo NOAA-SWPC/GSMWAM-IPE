@@ -176,7 +176,7 @@ def parse(start_date, end_date, hduration):
     min_f107 = start_date
   else:                                                                    # start interpolation from prior day
     min_f107 = new_timestamp(start_date, -24)
-  
+
   if float(ending_min) / mins_per_f107_segment > midpoint_f107_fraction:   # end interpolation at next day
     max_f107 = new_timestamp(end_date,    24)
   else:                                                                    # end interpolation at current day
@@ -301,9 +301,9 @@ def netcdf_output(file, kp, f107, f107d, kp_avg, swbt, swangle, swvel, swbz, hem
   _o.close()
 
 
-LOOKUP_TABLE = [   0,   4,   5,   6,   7,   9,  12,  15,  18,  22,
-                  27,  32,  39,  48,  56,  67,  80,  94, 111, 132,
-                 154, 179, 207, 236, 300, 400, 999 ]    
+LOOKUP_TABLE = [   0,   2,   3,   4,   5,   6,   7,   9,  12,  15,
+                  18,  22,  27,  32,  39,  48,  56,  67,  80,  94,
+                 111, 132, 154, 179, 207, 236, 300, 400, 999 ]
 VAR_NAMES = [ 'f107', 'kp', 'f107d', 'kpa', 'nhp', 'nhpi', 'shp', 'shpi', 'swbt',
                    'swang', 'swvel', 'swbz', 'swden', 'ap', 'apa' ]
 VAR_TYPES = [ 'f4', 'f4', 'f4', 'f4', 'f4', 'i2', 'f4', 'i2', 'f4',
@@ -316,7 +316,7 @@ VAR_LONG_NAMES = [ '10.7cm Solar Radio Flux' , 'Kp Index', '41-Day F10.7 Average
 VAR_UNITS = [ 'sfu', None, 'sfu', None, 'GW', None, 'GW', None,
               'nT', 'degrees', 'm/s', 'nT', 'cm^-3', None, None ]
 ### main function
-                    
+
 def run(start_date, duration, output_filename):
   end_date = new_timestamp(start_date, duration)
   kp, f107, f107d, kp_avg, swbt, swangle, swvel, swden, swbz, hemi_pow, hemi_pow_idx = parse(start_date, end_date, duration)

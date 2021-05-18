@@ -78,7 +78,7 @@ def main():
                 # write
                 ip.netcdf_output()
                 # touch and advance
-                touch(target_date)                
+                touch(current_date)
                 current_date += timedelta(minutes=args.duration)
                 target_date  += timedelta(minutes=args.duration)
             except Exception as e:
@@ -86,6 +86,8 @@ def main():
                 pass
         else:
             sleep(SLEEP_TIME)
+
+    touch(end_date)
 
 if __name__ == '__main__':
     main()
