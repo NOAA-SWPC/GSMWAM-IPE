@@ -36,8 +36,8 @@
 /
 &OPERATIONAL
   COLFAC                 = ${COLFAC}
-  OFFSET1_DEG            = ${OFFSET1}
-  OFFSET2_DEG            = ${OFFSET2}
+  OFFSET1_DEG            = ${OFFSET1_DEG}
+  OFFSET2_DEG            = ${OFFSET2_DEG}
   POTENTIAL_MODEL        = ${POTENTIAL_MODEL}
   HPEQ                   = ${HPEQ}
   TRANSPORT_HIGHLAT_LP   = ${TRANSPORT_HIGHLAT_LP}
