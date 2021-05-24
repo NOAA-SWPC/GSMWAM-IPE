@@ -1216,6 +1216,8 @@ if [ $IDEA = .true. ]; then
     export TRANSPORT_HIGHLAT_LP=${TRANSPORT_HIGHLAT_LP:-30}
     export PERP_TRANSPORT_MAX_LP=${PERP_TRANSPORT_MAX_LP:-151}
     export VERTICAL_WIND_LIMIT=${VERTICAL_WIND_LIMIT:-100.0}
+    export IHEPLS=${IHEPLS:-1}
+    export INPLS=${INPLS:-1}
 
     # IPE fix files
     #${NLN} $BASE_NEMS/../IPELIB/run/coeff* ${DATA}
