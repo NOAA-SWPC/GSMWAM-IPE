@@ -849,6 +849,8 @@ else
   FDATE=$(echo $CIPEDATE | cut -c1-10)
 fi
 
+GDATE=$($NDATE -6 $CDATE)
+
 FH=$((10#$FHINI))
 [[ $FH -lt 10 ]]&&FH=0$FH
 if [[ $FHINI -gt 0 ]] ; then
@@ -1020,7 +1022,7 @@ while [[ $NEMS = .true. ]] && [[ 10#$FH -le $FHMAX ]] ; do
     FNSUB=""
   fi
   if [ $DOIAU = YES ]; then
-    if [ 10#$FH -lt 10#6 ]; then
+    if [ "10#$FH" -lt "10#6" ]; then
       FHIAU=$((10#6-10#$FH))
       FHIAU=m$FHIAU
     else
@@ -1127,13 +1129,14 @@ if [ $GOCART == 1 ] ; then
  ln -sf $FIX_NGAC  ngac_fix
 fi
 
+
 if [ $DOIAU = YES ]; then
+  export DYNVARS=$DYNVARS$IAUVARS
+  export PHYVARS=$PHYVARS$IAUVARS
   export RESTART=.false.
-
   export FHRES=3
-  export FHOUT=1
+  #export FHOUT=1 # ???
   export FHZER=3
-
   export IAU=.true.
   SWIO_IDATE=$($NDATE +6 $CDATE)0000
 else
@@ -1207,11 +1210,12 @@ if [ $IDEA = .true. ]; then
     export DYNAMO_EFIELD=${DYNAMO_EFIELD:-"T"}
     export COLFAC=${COLFAC:-1.3}
     export OFFSET1_DEG=${OFFSET1_DEG:-5.0}
-    export OFFSET2_DEG=${OFFSET2_DEGi:-20.0}
+    export OFFSET2_DEG=${OFFSET2_DEG:-20.0}
     export POTENTIAL_MODEL=${POTENTIAL_MODEL:-2}
     export HPEQ=${HPEQ:-0.0}
     export TRANSPORT_HIGHLAT_LP=${TRANSPORT_HIGHLAT_LP:-30}
     export PERP_TRANSPORT_MAX_LP=${PERP_TRANSPORT_MAX_LP:-151}
+    export VERTICAL_WIND_LIMIT=${VERTICAL_WIND_LIMIT:-100.0}
 
     # IPE fix files
     #${NLN} $BASE_NEMS/../IPELIB/run/coeff* ${DATA}
