@@ -143,7 +143,8 @@ output_grid_type: latlon
 #
 # If #levels < 0, ungridded #nlevels will be added
 #
-output_grid_size: 90 91 -150
+#output_grid_size: 90 91 -150
+output_grid_size: 180 91 -150
 #
 # Minimin and maximum values of vertical coordinate (km)
 # Used if #levels > 0
