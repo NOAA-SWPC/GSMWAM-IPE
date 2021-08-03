@@ -4,11 +4,11 @@
 # Prepares libE jobcard with job submission details plundered from cheyenne.config and config/cheyenne.config.  
 # Presently setup for wamStandalone 
 
-# Total nodes for parallel forecast members (1 node is needed for libe manager). 
-libe_nodes=3 
+# Total nodes for parallel forecast members (1 node is needed for libE manager). 
+libE_nodes=3 
 # Total wallclock time for entire ensemble
-libe_wallclock=00:20:00
-# Number of libE workers (If one simulation runs per node, n_workers = libe_nodes -1)
+libE_wallclock=00:20:00
+# Number of libE workers (If one simulation runs per node, n_workers = libE_nodes -1)
 n_workers=2
 # Number of ensemble members/simulations (typically a multple of workers)
 n_sim=4
@@ -63,7 +63,7 @@ CONFIG=$( echo $bn | cut -d'.' -f 1 )
 
 if [ $? != 0 ]; then echo "setup failed, exit"; exit; fi
 
-NODES=$libE_NODES
+NODES=$libE_nodes
 ## PBS stuff
 SCHEDULER_SUB=${SCHEDULER_SUB:-'qsub'}
 SCHEDULER=${SCHEDULER:-'#PBS'}
@@ -123,8 +123,6 @@ cat >> $tmp << EOF
 # setup ensemble directory RUNDIR and ROTDIR (clean up from the configure check)
 rm -rf $RUNDIR
 mkdir -p $RUNDIR
-
-# mkdir -p $ROTDIR
 
 python libE_calling_func.py $n_workers $n_sim
 EOF

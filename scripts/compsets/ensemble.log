@@ -1,0 +1,80 @@
+[0] libensemble.libE_manager (INFO): Manager initiated on node r2i7n4
+[0] libensemble.libE_manager (INFO): Manager exit_criteria: {'sim_max': 4}
+[0] libensemble.libE_manager (DEBUG): Manager sending work unit to worker 1
+[0] libensemble.libE_manager (DEBUG): Manager sending work unit to worker 2
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 1
+[1] libensemble.resources.resources (DEBUG): split_list is [['r2i7n9.ib0.cheyenne.ucar.edu'], ['r2i7n3.ib0.cheyenne.ucar.edu']]
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 2
+[2] libensemble.resources.resources (DEBUG): split_list is [['r2i7n9.ib0.cheyenne.ucar.edu'], ['r2i7n3.ib0.cheyenne.ucar.edu']]
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 1
+[1] libensemble.resources.resources (DEBUG): Worker's local_nodelist is ['r2i7n9.ib0.cheyenne.ucar.edu']
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 2
+[2] libensemble.resources.resources (DEBUG): Worker's local_nodelist is ['r2i7n3.ib0.cheyenne.ucar.edu']
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 1
+[1] libensemble.libE_worker (INFO): Worker 1 initiated on node r2i7n4
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 2
+[2] libensemble.libE_worker (INFO): Worker 2 initiated on node r2i7n4
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 1
+[1] libensemble.libE_worker (DEBUG): Iteration 1
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 2
+[2] libensemble.libE_worker (DEBUG): Iteration 1
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 1
+[1] libensemble.libE_worker (DEBUG): Received calc_in (sim) of len 1
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 2
+[2] libensemble.libE_worker (DEBUG): Received calc_in (sim) of len 1
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 1
+[1] libensemble.libE_worker (DEBUG): Running sim
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 1
+[1] libensemble.libE_worker (DEBUG): Calling calc 1
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 2
+[2] libensemble.libE_worker (DEBUG): Running sim
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 2
+[2] libensemble.libE_worker (DEBUG): Calling calc 1
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 1
+[1] libensemble.libE_worker (DEBUG): Return from calc call
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 1
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 1
+[1] libensemble.libE_worker (DEBUG): Sending to Manager with status 0
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 1
+[0] libensemble.libE_manager (DEBUG): Manager sending work unit to worker 1
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 1
+[1] libensemble.libE_worker (DEBUG): Iteration 2
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 1
+[1] libensemble.libE_worker (DEBUG): Received calc_in (sim) of len 1
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 1
+[1] libensemble.libE_worker (DEBUG): Running sim
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 1
+[1] libensemble.libE_worker (DEBUG): Calling calc 1
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 2
+[2] libensemble.libE_worker (DEBUG): Return from calc call
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 2
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 2
+[2] libensemble.libE_worker (DEBUG): Sending to Manager with status 0
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 2
+[0] libensemble.libE_manager (DEBUG): Manager sending work unit to worker 2
+[0] libensemble.libE_manager (INFO): Term test tripped: sim_max
+[0] libensemble.libE_manager (INFO): Term test tripped: sim_max
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 2
+[2] libensemble.libE_worker (DEBUG): Iteration 2
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 2
+[2] libensemble.libE_worker (DEBUG): Received calc_in (sim) of len 1
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 2
+[2] libensemble.libE_worker (DEBUG): Running sim
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 2
+[2] libensemble.libE_worker (DEBUG): Calling calc 1
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 1
+[1] libensemble.libE_worker (DEBUG): Return from calc call
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 1
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 1
+[1] libensemble.libE_worker (DEBUG): Sending to Manager with status 0
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 1
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 2
+[2] libensemble.libE_worker (DEBUG): Return from calc call
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 2
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 2
+[2] libensemble.libE_worker (DEBUG): Sending to Manager with status 0
+[0] libensemble.libE_manager (DEBUG): Manager receiving from Worker: 2
+[0] libensemble.libE (INFO): libE_manager total time: 1147.266
+[0] libensemble.libE (DEBUG): Manager exiting
+[0] libensemble.libE (DEBUG): Exiting with 2 workers.
+[0] libensemble.libE (DEBUG): Exiting with exit criteria: {'sim_max': 4}

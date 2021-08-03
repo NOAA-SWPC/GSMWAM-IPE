@@ -45,7 +45,7 @@ def call_ensemble(nworkers, n_sim):
     print(datetime.now().hour,':', datetime.now().minute, ':', datetime.now().second,'.', datetime.now().microsecond, " Ending libE")
 
 ### Ensemble settings
-n_workers = sys.argv[1] # excludes the master node where libE runs
-n_sim = sys.argv[2]
+n_workers = int(sys.argv[1]) # excludes the master node where libE runs
+n_sim = int(sys.argv[2])
 
 call_ensemble(n_workers, n_sim)

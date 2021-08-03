@@ -1,0 +1,4 @@
+Worker     1: Calc     0: sim Time: 596.873 Start: 2021-08-03 11:19:31.162 End: 2021-08-03 11:29:28.035 Status: Not set
+Worker     2: Calc     0: sim Time: 597.329 Start: 2021-08-03 11:19:31.162 End: 2021-08-03 11:29:28.491 Status: Not set
+Worker     1: Calc     1: sim Time: 550.204 Start: 2021-08-03 11:29:28.038 End: 2021-08-03 11:38:38.242 Status: Not set
+Worker     2: Calc     1: sim Time: 549.930 Start: 2021-08-03 11:29:28.493 End: 2021-08-03 11:38:38.423 Status: Not set

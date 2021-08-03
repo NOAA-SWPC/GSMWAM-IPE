@@ -19,4 +19,9 @@ See libEnsemble documentation for installation: https://libensemble.readthedocs.
 6. cheyenne_libE.config
     * This is essentially a copy of cheyenne.config tailored to the specific needs of an ensemble. For instance, updating FIX_F107 and FIX_KP to be altered for each member. 
 7. libE_WAM_submit.sh - essentially submit.sh, but with the PBS statements removed. (no need to edit)
- 
+
+When an ensemble is run some additional files will appear in this directory. 
+* ensemble.log - a log file provided by libE, useful to check that workers were placed on different nodes
+* libE_stats.txt - stats file provided by libE
+* libE_mem_config - directory with member configuration scripts
+* node_list - libE requires the PBS_NODEFILE to be written to file

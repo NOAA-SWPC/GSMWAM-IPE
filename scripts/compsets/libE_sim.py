@@ -12,10 +12,11 @@ def submit_wam(H, persis_info, sim_specs, _):
 
     out = np.zeros(1, dtype=sim_specs['out'])
 
-    print("LibE simulation number: "+ str(int(H['x'][0])))
 
     # Identify simulation number
     run_id = int(H['x'][0])
+    
+    print("LibE simulation number: "+ str(run_id))
     
     # inputs are updated in bash script
     subprocess.run(["./libE_WAM_member.sh", str(run_id)], shell = False)

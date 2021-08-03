@@ -41,7 +41,7 @@ export kp=${col1}
 #cd $job_dir
 
 mkdir -p libE_mem_config
-envsubst '${JOBNAME} ${F10p7} ${kp}' < cheyenneLibE.config > libE_mem_config/mem_${mem}.config
+envsubst '${JOBNAME} ${F10p7} ${kp}' < cheyenne_libE.config > libE_mem_config/mem_${mem}.config
 
 #./submit.sh mem_${mem}.config 1 $cycles
 ./libE_WAM_submit.sh libE_mem_config/mem_${mem}.config ${mem}
