@@ -1,6 +1,8 @@
-# libEnsemble with WAM-IPE
+# Ensemble Guide
 
-Use libEnsemble (libE) Python library for resource allocation with large WAM ensembles. 
+Use libEnsemble (libE) Python library for resource allocation with large WAM or WAM-IPE ensembles. 
+
+## Setup libEnsemble 
 
 LibE requires Python 3.6 or above. The libE submission script for Cheyenne assumes the creation of a conda environment 
 that has libE enabled. For instance, to install conda and create a Python environment with libE on Cheyenne:
@@ -17,10 +19,12 @@ conda install -c conda-forge libensemble
 pip install libensemble[extras]
 conda deactivate
 ```
-
- libE documentation for installation: https://libensemble.readthedocs.io/en/main/introduction.html
+libE documentation for installation: https://libensemble.readthedocs.io/en/main/introduction.html
 
 ## Scripts
+
+libE scripts can be found in [scripts/compsets/](scripts/compsets/), the directory from which the ensemble job is 
+submitted.
 
 1. submit_libE.sh - submit libE job, i.e. 'submit_libE.sh cheyenne_libE.config'
     * Update the number of nodes, wallclock time, n_workers and n_sim as appropriate

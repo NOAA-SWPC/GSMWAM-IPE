@@ -1,7 +1,6 @@
-import numpy as np
 import subprocess
+import numpy as np
 
-from libensemble.executors.executor import Executor
 
 def submit_wam(H, persis_info, sim_specs, _):
     """
@@ -12,14 +11,13 @@ def submit_wam(H, persis_info, sim_specs, _):
 
     out = np.zeros(1, dtype=sim_specs['out'])
 
-
     # Identify simulation number
     run_id = int(H['x'][0])
-    
-    print("LibE simulation number: "+ str(run_id))
-    
+
+    print("LibE simulation number: " + str(run_id))
+
     # inputs are updated in bash script
-    subprocess.run(["./libE_WAM_member.sh", str(run_id)], shell = False)
-    
+    subprocess.run(["./libE_WAM_member.sh", str(run_id)], shell=False)
+
     out['y'] = 0.8
     return out, persis_info

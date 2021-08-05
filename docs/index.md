@@ -12,4 +12,5 @@ caption: Contents
 source/quickstart-guide.md
 source/getting-started.md
 source/developer-guide.md
+source/ensemble-guide.md
 ```
