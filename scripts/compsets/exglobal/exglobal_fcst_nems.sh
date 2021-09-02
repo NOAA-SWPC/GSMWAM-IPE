@@ -398,9 +398,9 @@ if [[ $VERBOSE = YES ]] ; then
   set -x
 fi
 #
-module purge	
-module use -a $BASEDIR/modulefiles/$BUILD_TARGET	
-module load wam-ipe	
+module purge
+module use -a $BASEDIR/modulefiles/$BUILD_TARGET
+module load wam-ipe
 module list
 
 export COMPLIANCECHECK=${COMPLIANCECHECK:-OFF}
