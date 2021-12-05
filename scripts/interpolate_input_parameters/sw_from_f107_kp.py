@@ -32,6 +32,9 @@ def swden_calc(): # this isn't used?
 def swvel_calc(kp):
   return 317.0+55.84*kp-2.71*kp**2
 
+def swesw_calc(kp):
+  return 0.1455+0.4675*kp-0.1446*kp**2+0.0276*kp**3
+
 def swang_calc(by,bz):
   ang = numpy.arctan2(by,bz)/math.pi*180
   return (360 + ang) * (ang < 0) + ang*(ang > 0)
@@ -39,14 +42,15 @@ def swang_calc(by,bz):
 def swby_calc():
   return 0.0
 
-def swbz_calc(kp,f107):
-  return -0.085*kp**2 - 0.08104*kp + 0.4337 + 0.00794 * f107 - 0.00219 * kp * f107
+def swbz_calc(Esw,vel):
+  return -Esw*1000/vel
 
 def hemi_pow_calc(kp):
   return 1.29 + 15.60*kp - 4.93*kp**2 + 0.64*kp**3
 
 def calc_solar_data(kp,f107):
   mylen = len(f107)
+  swesw    = numpy.ones(mylen)
   swbt     = numpy.ones(mylen)
   swangle  = numpy.ones(mylen)
   swvel    = numpy.ones(mylen)
@@ -55,11 +59,12 @@ def calc_solar_data(kp,f107):
   hemi_pow = numpy.ones(mylen)
   hemi_pow_idx = numpy.ones(mylen)
   for i in range(len(f107)):
-    swbz[i]         = swbz_calc(kp[i],f107[i])
+    swesw[i]        = swesw_calc(kp[i])
     swbt[i]         = swbt_calc(swbz[i],swby_calc())
     hemi_pow[i]     = hemi_pow_calc(kp[i])
     swangle[i]      = swang_calc(swby_calc(),swbz[i])
     swvel[i]        = swvel_calc(kp[i])
+    swbz[i]         = swbz_calc(swesw[i],swvel[i])
     swden[i]        = swden_calc()
     hemi_pow_idx[i] = hpi_from_gw(hemi_pow[i])
   return swbt,swangle,swvel,swden,swbz,hemi_pow,hemi_pow_idx
