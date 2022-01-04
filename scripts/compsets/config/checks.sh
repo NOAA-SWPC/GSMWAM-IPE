@@ -26,9 +26,9 @@ done
 if [[ $NEMS = .true. ]] ; then
 # WAM frequency checks
 echo "checking properties of the frequency options (FHOUT, FHRES, FHDFI, FHCYC, FHZER)"
-if [ -z $FHOUT ] || [ $FHOUT -gt $FHMAX ] ; then
-	echo "   FHOUT is invalid, setting to $FHMAX"
-	export FHOUT=$FHMAX
+if [ -z $FHOUT ] || [ $FHOUT -gt $FHSEG ] ; then
+	echo "   FHOUT is invalid, setting to $FHSEG"
+	export FHOUT=$FHSEG
 fi
 # rule 1: positive DELTIM
 if [ -z $DELTIM ] || [ $DELTIM -le 0 ] ; then
@@ -100,9 +100,9 @@ if [ $IDEA = .true. ] ; then
 			echo "   IPEGRID not found! exiting." ; exit 1
 		fi
 		echo "checking to make sure IPE output frequency is valid (IPEFREQ): $IPEFREQ"
-		if [ $IPEFREQ -gt $((FHMAX*3600)) ] ; then # IPEFREQ > model run time
-			echo "   IPEFREQ too high... setting IPEFREQ to $((FHMAX*3600))"
-			export IPEFREQ=$((FHMAX*3600))
+		if [ $IPEFREQ -gt $((FHSEG*3600)) ] ; then # IPEFREQ > model run time
+			echo "   IPEFREQ too high... setting IPEFREQ to $((FHSEG*3600))"
+			export IPEFREQ=$((FHSEG*3600))
 		elif [ $IPEFREQ -lt $DELTIM_IPE ] ; then # IPEFREQ < model integration step time
 			echo "   setting IPEFREQ to DELTIM_IPE"
 			export IPEFREQ=$DELTIM_IPE
