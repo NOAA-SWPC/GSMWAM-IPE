@@ -16,7 +16,6 @@ module-whatis "loads GSMWAM-IPE prerequisites on WCOSS2"
 ## this typically includes compiler, MPI and job scheduler
 ##
 
-module load envvar/$env(envvar_ver)
 module load PrgEnv-intel/$env(PrgEnv_intel_ver)
 module load craype/$env(craype_ver)
 module load intel/$env(intel_ver)
@@ -33,9 +32,9 @@ module load sp/$env(sp_ver)
 
 # comio load occurs out of $HOMEwfs/modulefiles and is implicitly specified
 # by build.ver as the version of COMIO that is checked out comes from build.ver.
+module use ../../../modulefiles
 module load comio
 
-module load python/$env(python_ver)
 ##
 ## set recommended Fortran compiler flags
 ##
