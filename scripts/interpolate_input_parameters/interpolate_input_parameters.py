@@ -16,6 +16,18 @@ from netCDF4 import Dataset
 # implement variable cadence
 # turn the YYYYMMDDHH strings into a class rather than having a mess of functions all over the place
 
+def compare_timestamp(date1,date2):
+  if datetime.datetime.strptime(date1,'%Y%m%d%H') == datetime.datetime.strptime(date2,'%Y-%m-%dT%H:%M:%SZ'):
+    return True
+  else:
+    return False
+
+def output_timestamp(start_date,delta=0):
+  return (datetime.datetime.strptime(start_date,'%Y-%m-%dT%H:%M:%SZ') + datetime.timedelta(minutes=delta)).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+def compare_create(start_date):
+  return datetime.datetime.strptime(start_date,'%Y-%m-%dT%H:%M:%SZ').strftime('%Y%m%d%H')
+
 ### weak failure handling
 
 def failure(fail_point):
@@ -222,6 +234,73 @@ def parse(start_date, end_date, hduration):
 def output_timestamp(start_date,delta=0):
   return (datetime.datetime.strptime(start_date,'%Y%m%d%H') + datetime.timedelta(minutes=delta)).strftime('%Y-%m-%dT%H:%M:%SZ')
 
+def txt_output(file, kp, f107, f107d, kpa, swbt, swangle, swvel, swbz, hemi_pow, hemi_pow_idx, swden, swby, date, coupled=True):
+    def running_average(arr):
+      vals = np.asarray(arr,dtype='float64')
+      output = np.zeros(len(vals)+AVERAGING_INTERVAL,dtype='float64')
+      output[AVERAGING_INTERVAL:] = vals
+      output[:AVERAGING_INTERVAL] = np.ones(AVERAGING_INTERVAL)*vals[0]
+      cumsum_vec = np.cumsum(np.insert(output, 0, 0))
+      return ((cumsum_vec[AVERAGING_INTERVAL:] - cumsum_vec[:-AVERAGING_INTERVAL])/AVERAGING_INTERVAL)[1:]
+
+    swbzo = running_average(swbz)
+    swbyo = running_average(swby)
+    swbxo = np.zeros(len(swby)) # running_average(swbx)
+    swdeo = running_average(swden)
+    swveo = running_average(swvel)
+    print(swbyo, swbzo)
+    swang = swang_calc(swbyo, swbzo)
+    swbt  = swbt_calc(swbyo, swbzo, swbxo)
+
+    f = open(file,'w')
+    f.write('Issue Date          \n')
+    f.write('Flags:  0=Forecast, 1=Estimated, 2=Observed \n\n')
+
+    f.write(" Date_Time                   F10          Kp     F10Flag      KpFlag  F10_41dAvg   24HrKpAvg    NHemiPow NHemiPowIdx    SHemiPow SHemiPowIdx       SW_Bt    SW_Angle SW_Velocity       SW_Bz      SW_Den   \n")
+    f.write("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------   \n")
+
+    write_output = False
+
+    for i in range(0,len(kp)):
+      if not write_output:
+        write_output = compare_timestamp(args.start_date,output_timestamp(date[0],i))
+        if write_output: flip = i
+      if write_output:
+        f.write("{0}{1:>12.7f}{2:>12.7f}{3:>12}{4:>12}{5:>12.7f}{6:>12.7f}{7:>12.7f}{8:>12}{9:>12.7f}{10:>12.7}{11:>12.7f}{12:>12.7f}{13:>12.7f}{14:>12.7f}{15:>12.7f}\n".format( \
+                 output_timestamp(date[0],i), \
+                 f107[i],                     \
+                 kp[i],                       \
+                 '2','1',                     \
+                 f107d[i],                    \
+                 kpa[i],                      \
+                 hemi_pow[i],                 \
+                 hemi_pow_idx[i],             \
+                 hemi_pow[i],                 \
+                 hemi_pow_idx[i],             \
+                 swbt[i],                     \
+                 swang[i],                    \
+                 swveo[i],                    \
+                 swbzo[i],                    \
+                 swdeo[i]))
+
+    for i in range(len(kp),args.duration*60+flip):
+      f.write("{0}{1:>12.7f}{2:>12.7f}{3:>12}{4:>12}{5:>12.7f}{6:>12.7f}{7:>12.7f}{8:>12}{9:>12.7f}{10:>12.7}{11:>12.7f}{12:>12.7f}{13:>12.7f}{14:>12.7f}{15:>12.7f}\n".format( \
+               output_timestamp(date[0],i), \
+               f107[-1],                    \
+               kp[-1],                      \
+               '2','1',                     \
+               f107d[-1],                   \
+               kpa[-1],                     \
+               hemi_pow[-1],                \
+               hemi_pow_idx[-1],            \
+               hemi_pow[-1],                \
+               hemi_pow_idx[-1],            \
+               swbt[-1],                    \
+               swang[-1],                   \
+               swveo[-1],                   \
+               swbzo[-1],                   \
+               swdeo[-1]))
+
 
 def netcdf_output(file, kp, f107, f107d, kp_avg, swbt, swangle, swvel, swbz, hemi_pow, hemi_pow_idx, swden, swby, coupled=True):
   def running_average(arr):
@@ -322,6 +401,7 @@ def run(start_date, duration, output_filename):
   kp, f107, f107d, kp_avg, swbt, swangle, swvel, swden, swbz, hemi_pow, hemi_pow_idx = parse(start_date, end_date, duration)
   swby = swbt * np.sin(swangle*math.pi/180)
   netcdf_output(output_filename, kp, f107, f107d, kp_avg, swbt, swangle, swvel, swbz, hemi_pow, hemi_pow_idx, swden, swby)
+  txt_output('wam_input_f107_kp.txt', kp, f107, f107d, kp_avg, swbt, swangle, swvel, swbz, hemi_pow, hemi_pow_idx, swden, swby, get_dates(new_timestamp(start_date,0),end_date))
 
 ### we start below
 

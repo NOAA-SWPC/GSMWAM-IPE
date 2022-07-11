@@ -4,8 +4,10 @@ from datetime import datetime, timedelta
 from time import sleep
 from glob import glob
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+from netCDF4 import Dataset
 
 SLEEP_TIME = 60
+DEFAULT_VAR = 'f107'
 
 def touch(dt):
     with open(dt.strftime("%Y%m%d_%H%M%S.lock"), "w") as f:
@@ -63,6 +65,8 @@ def main():
     end_date = datetime.strptime(args.end_date,'%Y%m%d%H%M')
 
     current_date = datetime.strptime(args.current_date,'%Y%m%d%H%M')
+    current_date += timedelta(minutes=len(Dataset(args.output).variables[DEFAULT_VAR][:]))
+
     target_date = current_date + timedelta(minutes=args.duration)
 
     ip = prt.InputParameters(current_date, args.duration, args.path, args.output, True, True)
