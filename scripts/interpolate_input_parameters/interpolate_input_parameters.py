@@ -266,7 +266,7 @@ def txt_output(file, kp, f107, f107d, kpa, swbt, swangle, swvel, swbz, hemi_pow,
         write_output = compare_timestamp(args.start_date,output_timestamp(date[0],i))
         if write_output: flip = i
       if write_output:
-        f.write("{0}{1:>12.7f}{2:>12.7f}{3:>12}{4:>12}{5:>12.7f}{6:>12.7f}{7:>12.7f}{8:>12}{9:>12.7f}{10:>12.7}{11:>12.7f}{12:>12.7f}{13:>12.7f}{14:>12.7f}{15:>12.7f}\n".format( \
+        f.write("{0}{1:>12.7f}{2:>12.7f}{3:>12}{4:>12}{5:>12.7f}{6:>12.7f}{7:>12.7f}{8:>12}{9:>12.7f}{10:>12}{11:>12.7f}{12:>12.7f}{13:>12.7f}{14:>12.7f}{15:>12.7f}\n".format( \
                  output_timestamp(date[0],i), \
                  f107[i],                     \
                  kp[i],                       \
@@ -284,7 +284,7 @@ def txt_output(file, kp, f107, f107d, kpa, swbt, swangle, swvel, swbz, hemi_pow,
                  swdeo[i]))
 
     for i in range(len(kp),args.duration*60+flip):
-      f.write("{0}{1:>12.7f}{2:>12.7f}{3:>12}{4:>12}{5:>12.7f}{6:>12.7f}{7:>12.7f}{8:>12}{9:>12.7f}{10:>12.7}{11:>12.7f}{12:>12.7f}{13:>12.7f}{14:>12.7f}{15:>12.7f}\n".format( \
+      f.write("{0}{1:>12.7f}{2:>12.7f}{3:>12}{4:>12}{5:>12.7f}{6:>12.7f}{7:>12.7f}{8:>12}{9:>12.7f}{10:>12}{11:>12.7f}{12:>12.7f}{13:>12.7f}{14:>12.7f}{15:>12.7f}\n".format( \
                output_timestamp(date[0],i), \
                f107[-1],                    \
                kp[-1],                      \
