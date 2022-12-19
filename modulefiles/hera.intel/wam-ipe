@@ -23,7 +23,8 @@ module load hpc-impi/2018.0.4
 
 module load hdf5/1.10.6
 module load netcdf/4.7.4
-module load esmf/8_2_0
+#module load esmf/8_2_0
+module load esmf/8.4.0b08
 
 module load bacio/2.4.1
 module load sp/2.3.3
@@ -37,13 +38,13 @@ setenv FC mpiifort
 ##
 ## load modules for SWIO
 ##
-module use -a /scratch1/NCEPDEV/swpc/Raffaele.Montuoro/swpc.spacepara/modulefiles
-module load pnetcdf/1.12.1
-module load comio/0.0.8
+##module use -a /scratch1/NCEPDEV/swpc/Raffaele.Montuoro/swpc.spacepara/modulefiles
+module load pnetcdf/1.11.2
 
 ## python
 module use -a /scratch1/NCEPDEV/swpc/Adam.Kubaryk/modulefiles
 module load anaconda/anaconda3-2019.10
+module load comio/0.0.8
 
 ##
 ## use workaround to prevent possible runtime failures with Intel MPI

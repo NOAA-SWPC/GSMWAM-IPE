@@ -1,17 +1,23 @@
 [submodule "WAM"]
-	path = WAM
-	url = https://github.com/NOAA-SWPC/WAM.git
+  path = WAM
+  #url = https://github.com/NOAA-SWPC/WAM.git
+  url = https://github.com/BrianCurtis-NOAA/WAM.git
+  branch = feature/esmf-update
 [submodule "IPE"]
 	path = IPE
 	url = https://github.com/NOAA-SWPC/IPE.git
 [submodule "NEMS"]
-	path = NEMS
-	url = https://github.com/NOAA-SWPC/NEMS.git
-	branch = develop
+  path = NEMS
+  #url = https://github.com/NOAA-SWPC/NEMS.git
+  #branch = develop
+	url = https://github.com/BrianCurtis-NOAA/NEMS.git
+	branch = feature/esmf-update
 [submodule "SWIO"]
-	path = SWIO
-	url = https://github.com/NOAA-SWPC/SWIO.git
-	branch = master
+  path = SWIO
+  #url = https://github.com/NOAA-SWPC/SWIO.git
+  #branch = master
+	url = https://github.com/BrianCurtis-NOAA/SWIO.git
+	branch = feature/esmf-update
 [submodule "DATAPOLL"]
 	path = DATAPOLL
 	url = https://github.com/NOAA-SWPC/DATAPOLL.git
