@@ -45,7 +45,7 @@ load(pathJoin("esmf", esmf_ver))
 
 -- comio load occurs out of $HOMEwfs/modulefiles and is implicitly specified
 -- by build.ver as the version of COMIO that is checked out comes from build.ver.
-prepend_path("MODULEPATH", "../../../modulefiles""
+prepend_path("MODULEPATH", "../../../modulefiles")
 comio_ver=os.getenv("comio_ver") or "0.0.10"
 load(pathJoin("comio", comio_ver))
 
