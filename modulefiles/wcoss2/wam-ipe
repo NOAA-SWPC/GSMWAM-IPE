@@ -53,3 +53,4 @@ load(pathJoin("comio", comio_ver))
 setenv("FCFLAGS", "-O2 -fp-model precise -ftz -fast-transcendentals -no-prec-div -no-prec-sqrt -align array64byte -align sequence")
 
 whatis("Description: WAM-IPE build environment")
+
