@@ -2,6 +2,9 @@ help([[
   loads NEMS WAM-IPE prerequisites for Cheyenne/Intel and MPT"
 ]])
 
+-- Netcdf conflicts with loads later on, unloading.
+unload("netcdf")
+
 ncarenv_ver=os.getenv("ncarenv_ver") or "1.3"
 load(pathJoin("ncarenv", ncarenv_ver))
 
