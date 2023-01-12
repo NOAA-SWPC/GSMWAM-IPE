@@ -3,5 +3,3 @@
 ## NEMS Application Builder file
 
 COMPONENTS=( WAM )
-NEMS_BUILDOPT=DEBUG=Y
-WAM_MAKEOPT=DEBUG=Y
