@@ -89,10 +89,7 @@ def get_f107d(dates):
   try:
     for cdate in dates:
       with open(path.join(args.path, 'KP_AP_F107', cdate[:4])) as file:
-        for line in file:
-          if line[:6] == hourless(cdate[2:]):
-            f107 = np.append(f107, float(line[65:71]))
-            break
+        f107.extend([float(line[65:71]) for line in file if line[:6] == hourless(cdate[2:])])
   except:
     failure('f107d read')
 
@@ -109,15 +106,13 @@ def get_kp_f107(dates):
     for cdate in dates:                                    # for each date to pull info for, open database file
       f107d = np.append(f107d, get_f107d(get_dates(new_timestamp(cdate,-24*40),new_timestamp(cdate,24*40))))
       with open(path.join(args.path, 'KP_AP_F107', cdate[:4])) as file:
-        for line in file:                                  # for each line
-          if line[:6] == hourless(cdate[2:]):              # match date, and append to lists
-            kp = np.append(kp, [float(line[i:i+2])/10 for i in range(12, 28, 2)])
-            f107 = np.append(f107, float(line[65:71]))
-            break # break out of the current file
+        f = file.readlines()
+        kp.extend([float(line[i:i+2])/10 for i in range(12, 28, 2) for line in f if line[:6] == hourless(cdate[2:])])
+        f107.extend([float(line[65:71])                            for line in f if line[:6] == hourless(cdate[2:])])
   except:
     failure('yearly kp_ap database read')
   # return the interpolated values
-  return interpolate(kp, mins_per_kp_segment), interpolate(f107, mins_per_f107_segment), interpolate(f107d, mins_per_f107_segment)
+  return interpolate(np.array(kp), mins_per_kp_segment), interpolate(np.array(f107), mins_per_f107_segment), interpolate(np.array(f107d), mins_per_f107_segment)
 
 def kp_avg_date_fmt(date):
    return date[:4] + '_doy' + "{:03d}".format(doy(date)) + '_avgkp.dat'
@@ -149,21 +144,20 @@ def get_solar_data(dates):
   try:
     for cdate in dates:
       with open(path.join(args.path, 'AURORA_POWER', cdate[:4], hemi_date_fmt(cdate))) as file:
-        for i, line in enumerate(file):
-          if i > 94:
-            split_line = line.split(' ')
-            swbt         = np.append(swbt,         float(split_line[0] ))
-            swangle      = np.append(swangle,      float(split_line[1] ))
-            swvel        = np.append(swvel,        float(split_line[3] ))
-            swden        = np.append(swden,        float(split_line[4] ))
-            bz           = np.append(bz,           float(split_line[5] ))
-            hemi_pow     = np.append(hemi_pow,     float(split_line[-1]))
-            hemi_pow_idx = np.append(hemi_pow_idx,       split_line[-2] )
-
-  except:
+        lines = np.array([[float(i) for i in line.split(' ')] for line in file.readlines()[95:]])
+        swbt.extend(   lines[:,0])
+        swangle.extend(lines[:,1])
+        swvel.extend(  lines[:,3])
+        swden.extend(  lines[:,4])
+        bz.extend(     lines[:,5])
+        hemi_pow.extend(lines[:,-1])
+        hemi_pow_idx.extend(lines[:,-2])
+  except Exception as e:
+    print(str(e))
     failure('hemispheric power read')
-
-  return swbt, swangle, swvel, swden, bz, hemi_pow, hemi_pow_idx
+  
+  return np.array(swbt),  np.array(swangle), np.array(swvel), \
+         np.array(swden), np.array(bz),      np.array(hemi_pow), np.array(hemi_pow_idx, dtype=int)
 
 def start_fixed_data(mduration):
   # read f107, kp
@@ -272,7 +266,7 @@ def txt_output(file, kp, f107, f107d, kpa, swbt, swangle, swvel, swbz, hemi_pow,
         write_output = compare_timestamp(args.start_date,output_timestamp(date[0],i))
         if write_output: flip = i
       if write_output:
-        f.write("{0}{1:>12.7f}{2:>12.7f}{3:>12}{4:>12}{5:>12.7f}{6:>12.7f}{7:>12.7f}{8:>12}{9:>12.7f}{10:>12.7}{11:>12.7f}{12:>12.7f}{13:>12.7f}{14:>12.7f}{15:>12.7f}\n".format( \
+        f.write("{0}{1:>12.7f}{2:>12.7f}{3:>12}{4:>12}{5:>12.7f}{6:>12.7f}{7:>12.7f}{8:>12}{9:>12.7f}{10:>12}{11:>12.7f}{12:>12.7f}{13:>12.7f}{14:>12.7f}{15:>12.7f}\n".format( \
                  output_timestamp(date[0],i), \
                  f107[i],                     \
                  kp[i],                       \
@@ -290,7 +284,7 @@ def txt_output(file, kp, f107, f107d, kpa, swbt, swangle, swvel, swbz, hemi_pow,
                  swdeo[i]))
 
     for i in range(len(kp),args.duration*60+flip):
-      f.write("{0}{1:>12.7f}{2:>12.7f}{3:>12}{4:>12}{5:>12.7f}{6:>12.7f}{7:>12.7f}{8:>12}{9:>12.7f}{10:>12.7}{11:>12.7f}{12:>12.7f}{13:>12.7f}{14:>12.7f}{15:>12.7f}\n".format( \
+      f.write("{0}{1:>12.7f}{2:>12.7f}{3:>12}{4:>12}{5:>12.7f}{6:>12.7f}{7:>12.7f}{8:>12}{9:>12.7f}{10:>12}{11:>12.7f}{12:>12.7f}{13:>12.7f}{14:>12.7f}{15:>12.7f}\n".format( \
                output_timestamp(date[0],i), \
                f107[-1],                    \
                kp[-1],                      \
@@ -338,7 +332,6 @@ def netcdf_output(file, kp, f107, f107d, kp_avg, swbt, swangle, swvel, swbz, hem
   swbxo = np.zeros(len(swby)) # running_average(swbx)
   swdeo = running_average(swden)
   swveo = running_average(swvel)
-  print(swbyo, swbzo)
   swang = swang_calc(swbyo, swbzo)
   swbt  = swbt_calc(swbyo, swbzo, swbxo)
 
@@ -368,7 +361,6 @@ def netcdf_output(file, kp, f107, f107d, kp_avg, swbt, swangle, swvel, swbz, hem
 
   # Variables
   for i in range(len(VAR_NAMES)):
-    print(VAR_NAMES[i])
     _vars.append(_o.createVariable(VAR_NAMES[i], VAR_TYPES[i], ('time',)))
     if VAR_UNITS[i] is not None:
       _vars[-1].units = VAR_UNITS[i]

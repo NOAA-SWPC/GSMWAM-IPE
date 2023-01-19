@@ -14,7 +14,7 @@
 # ----------------------------------------------------------------------
 # Decide the conf and modulefile names.
 
-CHOSEN_MODULE=$(BUILD_TARGET)/wam-ipe
+CHOSEN_MODULE=$(BUILD_TARGET)/wam-ipe.lua
 
 CONFIGURE_NEMS_FILE=configure.wam-ipe.$(BUILD_TARGET)
 
