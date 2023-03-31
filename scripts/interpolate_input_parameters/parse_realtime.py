@@ -280,8 +280,9 @@ class InputParameters(object):
             for child in root.findall('data-item'):
                 time = datetime.strptime(child.get('time-tag'), WAM_INPUT_FMT)
                 try:
-                    f107[time]  = max(float(child.find('f10').text), F107_MIN)
-                    f107d[time] = max(float(child.find('f10-41-avg').text), F107D_MIN)
+                    if time.hour == 12:
+                        f107[time]  = max(float(child.find('f10').text), F107_MIN)
+                        f107d[time] = max(float(child.find('f10-41-avg').text), F107D_MIN)
                     ap[time]    = self.ap_from_kp(min(float(child.find('kp').text), KP_MAX))
                     apa[time]   = self.ap_from_kp(min(float(child.find('kp-24-hr-avg').text), KPA_MAX))
                 except:
