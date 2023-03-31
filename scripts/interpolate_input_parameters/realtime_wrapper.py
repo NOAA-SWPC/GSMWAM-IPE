@@ -11,7 +11,7 @@ DEFAULT_VAR = 'f107'
 
 def touch(dt):
     with open(dt.strftime("%Y%m%d_%H%M%S.lock"), "w") as f:
-        pass
+        f.write(datetime.now().strftime('%Y%m%d_%H%M%S'))
 
 def proceed(dt):
     tdelta = datetime.now() - dt
@@ -54,8 +54,8 @@ def main():
                description='Parse KP, F10.7, 24hr average Kp, and hemispheric power files into binned data', \
                formatter_class=ArgumentDefaultsHelpFormatter \
              )
-    parser.add_argument('-c', '--current_date',help='current date of run (YYYYMMDDhhmm)', type=str, default='202102170015')
-    parser.add_argument('-e', '--end_date',    help='end date of run (YYYYMMDDhh)', type=str, default='202006010559')
+    parser.add_argument('-c', '--current_date',help='current date of run (YYYYmmddHHMM)', type=str, default='202102170015')
+    parser.add_argument('-e', '--end_date',    help='end date of run (YYYYmmddHHMM)', type=str, default='202006010559')
     parser.add_argument('-d', '--duration',    help='duration (mins) of each segment',   type=int, default=15)
     parser.add_argument('-p', '--path',        help='path to input parameters', type=str, default=prt.DEFAULT_PATH)
     parser.add_argument('-o', '--output',      help='full path to output file', type=str, default=prt.DEFAULT_NAME)
@@ -69,7 +69,9 @@ def main():
 
     target_date = current_date + timedelta(minutes=args.duration)
 
-    ip = prt.InputParameters(current_date, args.duration, args.path, args.output, True, True)
+    driver_end_date = datetime.strptime(prt.EDATE, '%Y%m%d%H%M')
+
+    ip = prt.InputParameters(current_date, args.duration, args.path, args.output, True, True, *[driver_end_date]*3)
     ip.parse()
 
     while current_date < end_date:
@@ -80,7 +82,10 @@ def main():
                 # parse
                 ip.parse()
                 # write
+                ip.outfile = 'input_parameters.nc'
                 ip.netcdf_output()
+                ip.outfile = 'wam_input_f107_kp.txt'
+                ip.output()
                 # touch and advance
                 touch(current_date)
                 current_date += timedelta(minutes=args.duration)
