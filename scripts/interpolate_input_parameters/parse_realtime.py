@@ -12,6 +12,7 @@ import glob
 from matplotlib import pyplot as plt
 from collections import OrderedDict as od
 from netCDF4 import Dataset
+import traceback
 
 # interpolate linearly between good values, only use decay on
 # forecasted values
@@ -102,6 +103,8 @@ class InputParameters(object):
 
         self.f107d = InputParameter(lambda x: F107_MIN) # 'self_avg'
         self.f107  = InputParameter(lambda x: F107_MIN) # np.nanmean(self.f107d.values())
+        self.apa   = InputParameter(lambda x: KP_RELAX)
+        self.ap    = InputParameter(lambda x: KP_RELAX)
         self.kpa   = InputParameter(lambda x: KP_RELAX)
         self.kp    = InputParameter(lambda x: KP_RELAX)
         self.swbz  = InputParameter(lambda x: swbz_calc(self.kp.dict[x], self.f107.dict[x]))
@@ -142,22 +145,25 @@ class InputParameters(object):
             b = []
         return key_dependent_dict(relax_func, zip(sorted_keys,b))
 
-    def ap_from_kp(self):
+    def ap_from_kp(self, v):
+        lookup = v*3
+        remainder = lookup - int(lookup)
+        return (1 - remainder) * self._lookup_table[int(lookup)] + \
+                    remainder  * self._lookup_table[int(lookup) + 1]
 
-      ap  = self.kp.dict.copy()
-      apd = self.kpa.dict.copy()
+    def kp_from_ap(self, v):
+        idx = list(x > v for x in self._lookup_table).index(True)
+        return ((v - self._lookup_table[idx-1])/(self._lookup_table[idx]-self._lookup_table[idx-1]) + idx - 1) / 3
 
-      for k,v in ap.items():
-          lookup = v*3
-          remainder = lookup - int(lookup)
-          ap[k]  = (1 - remainder) * self._lookup_table[int(lookup)] + \
-                        remainder  * self._lookup_table[int(lookup) + 1]
-      for k,v in apd.items():
-          lookup = v*3
-          remainder = lookup - int(lookup)
-          apd[k] = (1 - remainder) * self._lookup_table[int(lookup)] + \
-                        remainder  * self._lookup_table[int(lookup) + 1]
-      return ap, apd
+    def all_kp_from_ap(self):
+        self.kp.dict = self.ap.dict.copy()
+        for k,v in self.kp.dict.items():
+            self.kp.dict[k] = self.kp_from_ap(v)
+
+        self.kpa.dict = self.apa.dict.copy()
+        for k,v in self.kpa.dict.items():
+            self.kpa.dict[k] = self.kp_from_ap(v)
+        
 
     def parse_geospace_input(self):
         swbz  = self.swbz.dict
@@ -263,8 +269,8 @@ class InputParameters(object):
                         date_list = [time + timedelta(minutes=i) for i in range(24*60*7+1)]
                         f107  = {k: None for k in date_list}
                         f107d = {k: None for k in date_list}
-                        kp    = {k: None for k in date_list}
-                        kpa   = {k: None for k in date_list}
+                        ap    = {k: None for k in date_list}
+                        apa   = {k: None for k in date_list}
                         break
                 except:
                     pass
@@ -276,28 +282,30 @@ class InputParameters(object):
                 try:
                     f107[time]  = max(float(child.find('f10').text), F107_MIN)
                     f107d[time] = max(float(child.find('f10-41-avg').text), F107D_MIN)
-                    kp[time]    = min(float(child.find('kp').text), KP_MAX)
-                    kpa[time]   = min(float(child.find('kp-24-hr-avg').text), KPA_MAX)
+                    ap[time]    = self.ap_from_kp(min(float(child.find('kp').text), KP_MAX))
+                    apa[time]   = self.ap_from_kp(min(float(child.find('kp-24-hr-avg').text), KPA_MAX))
                 except:
                     pass
         except:
             print('WARNING: no valid wam_input file found!')
             f107  = self.f107.dict
             f107d = self.f107d.dict
-            kp    = self.kp.dict
-            kpa   = self.kpa.dict
+            ap    = self.ap.dict
+            apa   = self.apa.dict
             pass
         # and interpolate them
         f107  = self.linear_int_missing_vals(f107,  self.f107.backwards_search)
         f107d = self.linear_int_missing_vals(f107d, self.f107d.backwards_search)
-        kp    = self.linear_int_missing_vals(kp,    self.kp.backwards_search)
-        kpa   = self.linear_int_missing_vals(kpa,   self.kpa.backwards_search)
+        ap    = self.linear_int_missing_vals(ap,    self.ap.backwards_search)
+        apa   = self.linear_int_missing_vals(apa,   self.apa.backwards_search)
         # now backfill with all available data
         for k in self.date_list:
             self.f107.dict[k]  = f107[k]
             self.f107d.dict[k] = f107d[k]
-            self.kp.dict[k]    = kp[k]
-            self.kpa.dict[k]   = kpa[k]
+            self.ap.dict[k]    = ap[k]
+            self.apa.dict[k]   = apa[k]
+        # and get kp
+        self.all_kp_from_ap()
 
     def parse(self):
         self.parse_wam_input()
@@ -333,12 +341,10 @@ class InputParameters(object):
         if self.append:
             _mode = 'a'
 
-        ap, apd = self.ap_from_kp()
-
         _fields = lambda k: [self.f107.dict[k], self.kp.dict[k], self.f107d.dict[k], self.kpa.dict[k],
                              self.hpn.dict[k], self.hpin.dict[k], self.hps.dict[k], self.hpis.dict[k],
                              self.swbt.dict[k], self.swang.dict[k], self.swveo.dict[k], self.swbzo.dict[k],
-                             self.swdeo.dict[k], ap[k], apd[k]]
+                             self.swdeo.dict[k], self.ap.dict[k], self.apa.dict[k]]
         # Open
         _o = Dataset(self.outfile, _mode, format='NETCDF3_64BIT_OFFSET')
         _vars = []
@@ -403,7 +409,7 @@ def main():
         ip.outfile = 'wam_input_f107_kp.txt'
         ip.output()
     except Exception as e:
-        print(e)
+        traceback.print_exc()
         pass
 
 
