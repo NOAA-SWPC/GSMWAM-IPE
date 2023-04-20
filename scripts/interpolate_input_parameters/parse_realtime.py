@@ -12,6 +12,8 @@ import glob
 from matplotlib import pyplot as plt
 from collections import OrderedDict as od
 from netCDF4 import Dataset
+import traceback
+from os.path import basename
 
 # interpolate linearly between good values, only use decay on
 # forecasted values
@@ -34,6 +36,7 @@ MAX_SEARCH_DIST    = 1
 DEFAULT_PATH = '.'
 DEFAULT_NAME = 'input_parameters.nc'
 MAX_WAIT = 120 # minutes
+EDATE = '999901010000'
 
 def backwards_search(dict,search_time,relax_func):
     # relax_func takes an argument of the current time
@@ -95,13 +98,23 @@ class InputParameters(object):
     _var_units = [ 'sfu', None, 'sfu', None, 'GW', None, 'GW', None,
                    'nT', 'degrees', 'm/s', 'nT', 'cm^-3', None, None ]
 
-    def __init__(self, start_date, mins, path, outfile, append, coupled):
+    def __init__(self, start_date, mins, path, outfile, append, coupled, ewam, egeo, eaur):
         self.start_date = start_date
         self.date_list   = [start_date + timedelta(minutes=i-SW_DATE_BACKWARDS) for i in range(mins+SW_DATE_BACKWARDS+MAX_WAIT)]
         self.output_list = [start_date + timedelta(minutes=i) for i in range(mins)]
 
+        self.ewam_date = ewam
+        self.egeo_date = egeo
+        self.eaur_date = eaur
+
+        self.fwam_date = ewam
+        self.fgeo_date = egeo
+        self.faur_date = eaur
+
         self.f107d = InputParameter(lambda x: F107_MIN) # 'self_avg'
         self.f107  = InputParameter(lambda x: F107_MIN) # np.nanmean(self.f107d.values())
+        self.apa   = InputParameter(lambda x: KP_RELAX)
+        self.ap    = InputParameter(lambda x: KP_RELAX)
         self.kpa   = InputParameter(lambda x: KP_RELAX)
         self.kp    = InputParameter(lambda x: KP_RELAX)
         self.swbz  = InputParameter(lambda x: swbz_calc(self.kp.dict[x], self.f107.dict[x]))
@@ -142,22 +155,25 @@ class InputParameters(object):
             b = []
         return key_dependent_dict(relax_func, zip(sorted_keys,b))
 
-    def ap_from_kp(self):
+    def ap_from_kp(self, v):
+        lookup = v*3
+        remainder = lookup - int(lookup)
+        return (1 - remainder) * self._lookup_table[int(lookup)] + \
+                    remainder  * self._lookup_table[int(lookup) + 1]
 
-      ap  = self.kp.dict.copy()
-      apd = self.kpa.dict.copy()
+    def kp_from_ap(self, v):
+        idx = list(x > v for x in self._lookup_table).index(True)
+        return ((v - self._lookup_table[idx-1])/(self._lookup_table[idx]-self._lookup_table[idx-1]) + idx - 1) / 3
 
-      for k,v in ap.items():
-          lookup = v*3
-          remainder = lookup - int(lookup)
-          ap[k]  = (1 - remainder) * self._lookup_table[int(lookup)] + \
-                        remainder  * self._lookup_table[int(lookup) + 1]
-      for k,v in apd.items():
-          lookup = v*3
-          remainder = lookup - int(lookup)
-          apd[k] = (1 - remainder) * self._lookup_table[int(lookup)] + \
-                        remainder  * self._lookup_table[int(lookup) + 1]
-      return ap, apd
+    def all_kp_from_ap(self):
+        self.kp.dict = self.ap.dict.copy()
+        for k,v in self.kp.dict.items():
+            self.kp.dict[k] = self.kp_from_ap(v)
+
+        self.kpa.dict = self.apa.dict.copy()
+        for k,v in self.kpa.dict.items():
+            self.kpa.dict[k] = self.kp_from_ap(v)
+        
 
     def parse_geospace_input(self):
         swbz  = self.swbz.dict
@@ -173,6 +189,8 @@ class InputParameters(object):
 #            swvel[k] = None
 
         for date in self.date_list:
+            if date - timedelta(minutes=DELAY_INTERVAL) > self.egeo_date:
+                break
             try:
                 fd = date - timedelta(minutes=DELAY_INTERVAL)
                 file = '{}/{}/swpc/geospace_input-{}.xml'.format(self.path,\
@@ -183,6 +201,7 @@ class InputParameters(object):
                 swby[date]  = float(item.find('mag_by_gsm').text)
                 swden[date] = float(item.find('proton_density').text)
                 swvel[date] = float(item.find('proton_speed').text)
+                self.fgeo_date = fd
             except:
                 pass
 
@@ -219,7 +238,7 @@ class InputParameters(object):
             hpn[k] = None
             hps[k] = None
 
-        days = list(set([datetime(dt.year, dt.month, dt.day) for dt in [date - timedelta(minutes=L1_DELAY) for date in self.date_list]]))
+        days = sorted(list(set([datetime(dt.year, dt.month, dt.day) for dt in [date - timedelta(minutes=L1_DELAY) for date in self.date_list]])))
 
         for day in days:
             try:
@@ -229,13 +248,16 @@ class InputParameters(object):
                     lines = list(filter(lambda s: not s.startswith('#') ,f.readlines()))
                 for line in lines:
                     split = line.split()
-                    try:
-                        dt = datetime.strptime('{}{}'.format(split[0],split[1]),'%Y-%m-%d%H:%M') + timedelta(minutes=L1_DELAY)
-                    except:
-                        dt = datetime.strptime(split[0],'%Y-%m-%d_%H:%M') + timedelta(minutes=L1_DELAY)
+                    dt = datetime.strptime(split[0],'%Y-%m-%d_%H:%M')
+                    if dt > self.eaur_date:
+                        break
+                    self.faur_date = dt
+                    dt += timedelta(minutes=L1_DELAY)
+
                     hpn[dt] = float(split[-2])
                     hps[dt] = float(split[-1])
-            except:
+            except Exception as e:
+                print(str(e))
                 pass
 
         hpn  = self.linear_int_missing_vals(hpn,  self.hpn.backwards_search, True)
@@ -249,13 +271,16 @@ class InputParameters(object):
 
     def parse_wam_input(self):
         # search backwards through latest wam_input file for most recent obs/forecast data
-        files = glob.glob('{}/????????/swpc/wam/wam_input*'.format(self.path))
-        files.sort(reverse=True)
+        files = sorted(glob.glob('{}/????????/swpc/wam/wam_input*'.format(self.path)), reverse=True)
         try:
-            for i in range(len(files)):
-                input = files[i]
+            for file in files:
+                fn = basename(file)
+                dt = datetime.strptime(fn, 'wam_input-%Y%m%dT%H%M.xml')
+                if dt > self.ewam_date: continue
+                self.fwam_date = dt
+
                 try:
-                    root = ET.parse(input).getroot()
+                    root = ET.parse(file).getroot()
                     time = datetime.strptime(root.find('data-item').get('time-tag'), WAM_INPUT_FMT)
                     if time - self.start_date <= timedelta(0):
                         if time + timedelta(days=7) - self.date_list[-1] < timedelta(0):
@@ -263,41 +288,43 @@ class InputParameters(object):
                         date_list = [time + timedelta(minutes=i) for i in range(24*60*7+1)]
                         f107  = {k: None for k in date_list}
                         f107d = {k: None for k in date_list}
-                        kp    = {k: None for k in date_list}
-                        kpa   = {k: None for k in date_list}
+                        ap    = {k: None for k in date_list}
+                        apa   = {k: None for k in date_list}
                         break
                 except:
                     pass
-                if i == len(files)-1: raise
             # now that we've found a good file, fill arrays
 
             for child in root.findall('data-item'):
                 time = datetime.strptime(child.get('time-tag'), WAM_INPUT_FMT)
                 try:
-                    f107[time]  = max(float(child.find('f10').text), F107_MIN)
-                    f107d[time] = max(float(child.find('f10-41-avg').text), F107D_MIN)
-                    kp[time]    = min(float(child.find('kp').text), KP_MAX)
-                    kpa[time]   = min(float(child.find('kp-24-hr-avg').text), KPA_MAX)
+                    if time.hour == 12:
+                        f107[time]  = max(float(child.find('f10').text), F107_MIN)
+                        f107d[time] = max(float(child.find('f10-41-avg').text), F107D_MIN)
+                    ap[time]    = self.ap_from_kp(min(float(child.find('kp').text), KP_MAX))
+                    apa[time]   = self.ap_from_kp(min(float(child.find('kp-24-hr-avg').text), KPA_MAX))
                 except:
                     pass
         except:
             print('WARNING: no valid wam_input file found!')
             f107  = self.f107.dict
             f107d = self.f107d.dict
-            kp    = self.kp.dict
-            kpa   = self.kpa.dict
+            ap    = self.ap.dict
+            apa   = self.apa.dict
             pass
         # and interpolate them
         f107  = self.linear_int_missing_vals(f107,  self.f107.backwards_search)
         f107d = self.linear_int_missing_vals(f107d, self.f107d.backwards_search)
-        kp    = self.linear_int_missing_vals(kp,    self.kp.backwards_search)
-        kpa   = self.linear_int_missing_vals(kpa,   self.kpa.backwards_search)
+        ap    = self.linear_int_missing_vals(ap,    self.ap.backwards_search)
+        apa   = self.linear_int_missing_vals(apa,   self.apa.backwards_search)
         # now backfill with all available data
         for k in self.date_list:
             self.f107.dict[k]  = f107[k]
             self.f107d.dict[k] = f107d[k]
-            self.kp.dict[k]    = kp[k]
-            self.kpa.dict[k]   = kpa[k]
+            self.ap.dict[k]    = ap[k]
+            self.apa.dict[k]   = apa[k]
+        # and get kp
+        self.all_kp_from_ap()
 
     def parse(self):
         self.parse_wam_input()
@@ -333,12 +360,10 @@ class InputParameters(object):
         if self.append:
             _mode = 'a'
 
-        ap, apd = self.ap_from_kp()
-
         _fields = lambda k: [self.f107.dict[k], self.kp.dict[k], self.f107d.dict[k], self.kpa.dict[k],
                              self.hpn.dict[k], self.hpin.dict[k], self.hps.dict[k], self.hpis.dict[k],
                              self.swbt.dict[k], self.swang.dict[k], self.swveo.dict[k], self.swbzo.dict[k],
-                             self.swdeo.dict[k], ap[k], apd[k]]
+                             self.swdeo.dict[k], self.ap.dict[k], self.apa.dict[k]]
         # Open
         _o = Dataset(self.outfile, _mode, format='NETCDF3_64BIT_OFFSET')
         _vars = []
@@ -348,6 +373,10 @@ class InputParameters(object):
         else:
             _o.skip = 0
         _o.ifp_interval = 60
+
+        _o.final_swfo_f10_kp_date  = self.fwam_date.strftime('%Y%m%d_%H%M%S')
+        _o.final_imf_date          = self.fgeo_date.strftime('%Y%m%d_%H%M%S')
+        _o.final_aurora_power_date = self.faur_date.strftime('%Y%m%d_%H%M%S')
 
         if not self.append:
             # Dimensions
@@ -359,7 +388,6 @@ class InputParameters(object):
 
             # Variables
             for i in range(len(self._var_names)):
-                print(self._var_names[i])
                 _vars.append(_o.createVariable(self._var_names[i], self._var_types[i], ('time',)))
 #                _vars[-1].long_name = self._var_long_names[i]
                 if self._var_units[i] is not None:
@@ -386,24 +414,30 @@ def main():
                description='Parse KP, F10.7, 24hr average Kp, and hemispheric power files into binned data', \
                formatter_class=ArgumentDefaultsHelpFormatter \
              )
-    parser.add_argument('-s', '--start_date', help='starting date of run (YYYYMMDDhhmm)', type=str, default='202006010000')
+    parser.add_argument('-s', '--start_date', help='starting date of run (YYYYmmddHHMM)', type=str, default='202006010000')
     parser.add_argument('-d', '--duration',   help='duration (mins) of run',   type=int, default=24*60)
     parser.add_argument('-p', '--path',       help='path to input parameters', type=str, default=DEFAULT_PATH)
     parser.add_argument('-o', '--output',     help='full path to output file', type=str, default=DEFAULT_NAME)
     parser.add_argument('-a', '--append',     help='clobbers and writes header if false', default=False, action='store_true')
     parser.add_argument('-c', '--coupled',    help='setup for coupled model run',         default=True, action='store_true')
+    parser.add_argument('-e', '--ewam_date',  help='end date of wam-input (YYYYmmddHHMM)',      type=str, default=EDATE)
+    parser.add_argument('-f', '--egeo_date',  help='end date of geospace-input (YYYYmmddHHMM)', type=str, default=EDATE)
+    parser.add_argument('-g', '--eaur_date',  help='end date of aurora_power (YYYYmmddHHMM)',   type=str, default=EDATE)
     args = parser.parse_args()
 
     start_date = datetime.strptime(args.start_date,'%Y%m%d%H%M')
+    ewam_date  = datetime.strptime(args.ewam_date, '%Y%m%d%H%M')
+    egeo_date  = datetime.strptime(args.egeo_date, '%Y%m%d%H%M')
+    eaur_date  = datetime.strptime(args.eaur_date, '%Y%m%d%H%M')
 
-    ip = InputParameters(start_date, args.duration, args.path, args.output, args.append, args.coupled)
+    ip = InputParameters(start_date, args.duration, args.path, args.output, args.append, args.coupled, ewam_date, egeo_date, eaur_date)
     try:
         ip.parse()
         ip.netcdf_output()
         ip.outfile = 'wam_input_f107_kp.txt'
         ip.output()
     except Exception as e:
-        print(e)
+        traceback.print_exc()
         pass
 
 
