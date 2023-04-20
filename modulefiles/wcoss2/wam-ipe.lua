@@ -37,10 +37,13 @@ load(pathJoin("sp", sp_ver))
 
 -- Look for libraries in "para"
 setenv("HPC_OPT", "/apps/ops/para/libs")
-prepend_path("MODULEPATH", "/apps/ops/para/libs/modulefiles/compiler/intel/19.1.3.304")
-prepend_path("MODULEPATH", "/apps/ops/para/libs/modulefiles/mpi/intel/19.1.3.304/cray-mpich/8.1.7")
+prepend_path("MODULEPATH", "/apps/dev/lmodules/intel/19.1.3.304")
+prepend_path("MODULEPATH", "/apps/dev/lmodules/intel_cray_mpich/19.1.3.304/cray-mpich/8.1.4")
 
-esmf_ver=os.getenv("esmf_ver") or "8.4.0b08"
+pio_ver=os.getenv("pio_ver") or "2.5.10"
+load(pathJoin("pio", pio_ver))
+
+esmf_ver=os.getenv("esmf_ver") or "8.4.1"
 load(pathJoin("esmf", esmf_ver))
 
 -- comio load occurs out of $HOMEwfs/modulefiles and is implicitly specified
