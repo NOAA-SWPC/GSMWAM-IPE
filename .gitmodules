@@ -5,7 +5,8 @@
   branch = feature/esmf-update
 [submodule "IPE"]
 	path = IPE
-	url = https://github.com/NOAA-SWPC/IPE.git
+	url = https://github.com/BrianCurtis-NOAA/IPE.git
+	branch = feature/esmf-update
 [submodule "NEMS"]
   path = NEMS
   #url = https://github.com/NOAA-SWPC/NEMS.git
@@ -20,4 +21,5 @@
 	branch = feature/esmf-update
 [submodule "DATAPOLL"]
 	path = DATAPOLL
-	url = https://github.com/NOAA-SWPC/DATAPOLL.git
+	url = https://github.com/BrianCurtis-NOAA/DATAPOLL.git
+	branch = feature/esmf-update
