@@ -19,7 +19,7 @@ echo $TASKS
 	check_var $var
 done
 # globally needed
-for var in APRUN NDATE MDATE BASE_NEMS FCSTEXEC EXGLOBALFCSTSH ; do
+for var in NDATE MDATE BASE_NEMS FCSTEXEC EXGLOBALFCSTSH ; do
 	check_var $var
 done
 
