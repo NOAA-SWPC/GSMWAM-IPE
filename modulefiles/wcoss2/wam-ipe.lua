@@ -46,7 +46,7 @@ load(pathJoin("esmf", esmf_ver))
 if os.getenv("HOMEwfs") then
   prepend_path("MODULEPATH", pathJoin(os.getenv("HOMEwfs"), "modulefiles"))
 else
-  append_path("MODULEPATH", "/lfs/h1/swpc/wam/noscrub/adam.kubaryk/wam-ipe_workflow/modulefiles")
+  append_path("MODULEPATH", "/lfs/h1/swpc/wam/noscrub/swpc.wam/wam-ipe_workflow/modulefiles")
 end
 comio_ver=os.getenv("comio_ver") or "v0.0.10"
 load(pathJoin("comio", comio_ver))
