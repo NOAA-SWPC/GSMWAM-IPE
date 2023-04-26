@@ -117,8 +117,8 @@ class InputParameters(object):
         self.ap    = InputParameter(lambda x: KP_RELAX)
         self.kpa   = InputParameter(lambda x: KP_RELAX)
         self.kp    = InputParameter(lambda x: KP_RELAX)
-        self.swbz  = InputParameter(lambda x: swbz_calc(self.kp.dict[x], self.f107.dict[x]))
-        self.swbzo = InputParameter(lambda x: swbz_calc(self.kp.dict[x], self.f107.dict[x]))
+        self.swbz  = InputParameter(lambda x: swbz_calc(swesw_calc(self.kp.dict[x]), self.swvel.dict[x]))
+        self.swbzo = InputParameter(lambda x: swbz_calc(swesw_calc(self.kp.dict[x]), self.swvel.dict[x]))
         self.swbx  = InputParameter(lambda x: swby_calc())
         self.swbxo = InputParameter(lambda x: swby_calc())
         self.swby  = InputParameter(lambda x: swby_calc())
@@ -213,10 +213,10 @@ class InputParameters(object):
 
         # now backfill with all available data
         for k in self.date_list:
+            self.swvel.dict[k] = swvel[k]
             self.swbz.dict[k]  = swbz[k]
             self.swby.dict[k]  = swby[k]
             self.swbx.dict[k]  = swbx[k]
-            self.swvel.dict[k] = swvel[k]
             self.swden.dict[k] = swden[k]
 
         # for solar wind, do averaging
@@ -257,7 +257,7 @@ class InputParameters(object):
                     hpn[dt] = float(split[-2])
                     hps[dt] = float(split[-1])
             except Exception as e:
-                print(str(e))
+                # print(str(e))
                 pass
 
         hpn  = self.linear_int_missing_vals(hpn,  self.hpn.backwards_search, True)
