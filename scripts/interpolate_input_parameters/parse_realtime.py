@@ -11,7 +11,7 @@ from math import exp
 import glob
 from matplotlib import pyplot as plt
 from collections import OrderedDict as od
-from netCDF4 import Dataset
+from netCDF4 import Dataset, date2num
 import traceback
 from os.path import basename
 
@@ -96,7 +96,7 @@ class InputParameters(object):
                         'IMF Total B Strength', 'Solar Wind Angle', 'Solar Wind Velocity',
                         'IMF Bz Strength', 'Solar Wind Density', 'Ap Index', '24hr Ap Average' ]
     _var_units = [ 'sfu', None, 'sfu', None, 'GW', None, 'GW', None,
-                   'nT', 'degrees', 'm/s', 'nT', 'cm^-3', None, None ]
+                   'nT', 'degrees', 'km/s', 'nT', 'cm^-3', None, None ]
 
     def __init__(self, start_date, mins, path, outfile, append, coupled, ewam, egeo, eaur):
         self.start_date = start_date
@@ -360,7 +360,8 @@ class InputParameters(object):
         if self.append:
             _mode = 'a'
 
-        _fields = lambda k: [self.f107.dict[k], self.kp.dict[k], self.f107d.dict[k], self.kpa.dict[k],
+        _fields = lambda k: [date2num(k, 'days since 1970-01-01'),
+                             self.f107.dict[k], self.kp.dict[k], self.f107d.dict[k], self.kpa.dict[k],
                              self.hpn.dict[k], self.hpin.dict[k], self.hps.dict[k], self.hpis.dict[k],
                              self.swbt.dict[k], self.swang.dict[k], self.swveo.dict[k], self.swbzo.dict[k],
                              self.swdeo.dict[k], self.ap.dict[k], self.apa.dict[k]]
@@ -382,19 +383,21 @@ class InputParameters(object):
             # Dimensions
             t_dim = _o.createDimension('time',  None)
 
-            t_var = _o.createVariable('time', 'i4', ('time',))
-#            t_var.long_name = 'Timesteps'
-            t_var.units     = 'minutes'
+            t_var = _o.createVariable('time', 'f8', ('time',))
+            t_var.units     = 'days since 1970-01-01'
+
+            _vars.append(t_var)
 
             # Variables
             for i in range(len(self._var_names)):
                 _vars.append(_o.createVariable(self._var_names[i], self._var_types[i], ('time',)))
-#                _vars[-1].long_name = self._var_long_names[i]
+                _vars[-1].long_name = self._var_long_names[i]
                 if self._var_units[i] is not None:
                     _vars[-1].units = self._var_units[i]
 
         else:
             t_var = _o.variables['time']
+            _vars.append(t_var)
             for i in range(len(self._var_names)):
                 _vars.append(_o.variables[self._var_names[i]])
 

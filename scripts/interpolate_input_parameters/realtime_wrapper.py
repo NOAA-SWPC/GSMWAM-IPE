@@ -28,7 +28,10 @@ def latest_date(path):
     hp_files.sort(reverse=True)
 
     sw_date = get_sw_date(sw_files[0].split('/')[-1])
-    hp_date = get_hp_date(open(hp_files[0], 'r'))
+    try:
+        hp_date = get_hp_date(open(hp_files[0], 'r'))
+    except:
+        hp_date = sw_date - timedelta(days=1)
 
     return min(sw_date, hp_date)
 
