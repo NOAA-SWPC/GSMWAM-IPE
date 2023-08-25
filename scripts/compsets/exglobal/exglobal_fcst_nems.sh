@@ -672,8 +672,8 @@ export JH_ann=${JH_ann:-0.0}
 export JH_st0=${JH_st0:-25000.0}
 export JH_st1=${JH_st1:-5000.0}
 
-export skeddy0=${skeddy0:-140.0}
-export skeddy_semiann=${skeddy_semiann:-60.0}
+export skeddy0=${skeddy0:-"70.0"}
+export skeddy_semiann=${skeddy_semiann:-"-10.0"}
 export skeddy_ann=${skeddy_ann:-0.0}
 
 export tkeddy0=${tkeddy0:-280.0}
