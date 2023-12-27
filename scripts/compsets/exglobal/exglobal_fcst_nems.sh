@@ -1050,14 +1050,7 @@ while [[ $NEMS = .true. ]] && [[ 10#$FH -le $FHMAX ]] ; do
 done
 # IPE
 if [[ $IPE = .true. ]] ; then
-  export CIPEDATE=${CIPEDATE:-$CDATE${IPEMINUTES:-00}}
-  STEPS=$(((10#$FHMAX-10#$FHINI)*60*60/IPEFREQ))
-  STEP=1
-  while [[ $STEP -le $STEPS ]] ; do
-    TIMESTAMP=`$MDATE $((STEP*IPEFREQ/60)) $CIPEDATE`
-    eval $NLN ${COMOUT}/${PLASO} ${PLASO}
-    STEP=$((STEP+1))
-  done
+  eval $NLN ${COMOUT} output
 fi
 if [[ $SWIO = .true. ]] ; then
   for iomodel in $SWIO_MODELS; do
