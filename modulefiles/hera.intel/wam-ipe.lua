@@ -52,7 +52,7 @@ setenv("CXX", "mpiicpc")
 setenv("FC", "mpiifort")
 
 prepend_path("MODULEPATH", "/scratch1/NCEPDEV/swpc/Adam.Kubaryk/modulefiles")
-comio_ver=os.getenv("comio_ver") or "0.0.8"
+comio_ver=os.getenv("comio_ver") or "0.0.10"
 load(pathJoin("comio", comio_ver))
 
 anaconda_ver=os.getenv("anaconda_ver") or "anaconda3-2019.10"
