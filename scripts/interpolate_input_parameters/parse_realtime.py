@@ -123,7 +123,7 @@ class InputParameters(object):
         self.swbxo = InputParameter(lambda x: swby_calc())
         self.swby  = InputParameter(lambda x: swby_calc())
         self.swbyo = InputParameter(lambda x: swby_calc())
-        self.swbt  = InputParameter(lambda x: swbt_calc(self.swbz.dict[x], self.swby.dict[x], self.swbx.dict[x]))
+        self.swbt  = InputParameter(lambda x: swbt_calc(self.swbz.dict[x], self.swby.dict[x]))
         self.swvel = InputParameter(lambda x: swvel_calc(self.kp.dict[x]))
         self.swveo = InputParameter(lambda x: swvel_calc(self.kp.dict[x]))
         self.swang = InputParameter(lambda x: swang_calc(swby_calc(), self.swbz.dict[x]))
@@ -228,7 +228,7 @@ class InputParameters(object):
 
         # and get swbt and swang
         for k in self.output_list:
-            self.swbt.dict[k]  = swbt_calc(self.swbzo.dict[k],self.swbyo.dict[k],self.swbxo.dict[k])
+            self.swbt.dict[k]  = swbt_calc(self.swbzo.dict[k],self.swbyo.dict[k])
             self.swang.dict[k] = swang_calc(self.swbyo.dict[k],self.swbzo.dict[k])
 
     def parse_aurora_power(self):
