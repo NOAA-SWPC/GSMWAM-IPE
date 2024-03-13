@@ -98,10 +98,12 @@ class InputParameters(object):
     _var_units = [ 'sfu', None, 'sfu', None, 'GW', None, 'GW', None,
                    'nT', 'degrees', 'km/s', 'nT', 'cm^-3', None, None ]
 
-    def __init__(self, start_date, mins, path, outfile, append, coupled, ewam, egeo, eaur):
+    def __init__(self, start_date, mins, path, outfile, append, coupled, ewam, egeo, eaur, derive=False):
         self.start_date = start_date
         self.date_list   = [start_date + timedelta(minutes=i-SW_DATE_BACKWARDS) for i in range(mins+SW_DATE_BACKWARDS+MAX_WAIT)]
         self.output_list = [start_date + timedelta(minutes=i) for i in range(mins)]
+
+        self.derive = derive
 
         self.ewam_date = ewam
         self.egeo_date = egeo
@@ -173,7 +175,6 @@ class InputParameters(object):
         self.kpa.dict = self.apa.dict.copy()
         for k,v in self.kpa.dict.items():
             self.kpa.dict[k] = self.kp_from_ap(v)
-        
 
     def parse_geospace_input(self):
         swbz  = self.swbz.dict
@@ -189,6 +190,8 @@ class InputParameters(object):
 #            swvel[k] = None
 
         for date in self.date_list:
+            if self.derive:
+                break
             if date - timedelta(minutes=DELAY_INTERVAL) > self.egeo_date:
                 break
             try:
@@ -241,6 +244,8 @@ class InputParameters(object):
         days = sorted(list(set([datetime(dt.year, dt.month, dt.day) for dt in [date - timedelta(minutes=L1_DELAY) for date in self.date_list]])))
 
         for day in days:
+            if self.derive:
+                break
             try:
                 file = '{}/{}/swpc/wam/swpc_aurora_power_{}.txt'.format(self.path, \
                            day.strftime(PATH_FMT), day.strftime(PATH_FMT))
@@ -416,6 +421,7 @@ def main():
     parser.add_argument('-e', '--ewam_date',  help='end date of wam-input (YYYYmmddHHMM)',      type=str, default=EDATE)
     parser.add_argument('-f', '--egeo_date',  help='end date of geospace-input (YYYYmmddHHMM)', type=str, default=EDATE)
     parser.add_argument('-g', '--eaur_date',  help='end date of aurora_power (YYYYmmddHHMM)',   type=str, default=EDATE)
+    parser.add_argument('-r', '--derive',     help='derive IMF, SW, HP from Kp', default=False, action='store_true')
     args = parser.parse_args()
 
     start_date = datetime.strptime(args.start_date,'%Y%m%d%H%M')
@@ -423,7 +429,9 @@ def main():
     egeo_date  = datetime.strptime(args.egeo_date, '%Y%m%d%H%M')
     eaur_date  = datetime.strptime(args.eaur_date, '%Y%m%d%H%M')
 
-    ip = InputParameters(start_date, args.duration, args.path, args.output, args.append, args.coupled, ewam_date, egeo_date, eaur_date)
+    ip = InputParameters(start_date, args.duration, args.path, args.output,
+                         args.append, args.coupled, ewam_date, egeo_date,
+                         eaur_date, args.derive)
     try:
         ip.parse()
         ip.netcdf_output()
