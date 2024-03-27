@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from itertools import chain
 from math import pi
 from sw_from_f107_kp import *
-from netCDF4 import Dataset
+from netCDF4 import Dataset, date2num
 
 ## takes 3hr-avg Kp, daily F10.7, and minute-binned hemispheric power and 24hr-avg Kp
 ## and translates them all to the same cadence (hard-coded 1 minute)
@@ -360,8 +360,8 @@ def netcdf_output(args, file, kp, f107, f107a, kp_avg, swbt, swangle, swvel, swd
 
     # Dimensions
     t_dim = _o.createDimension('time',  None)
-    t_var = _o.createVariable('time', 'i4', ('time',))
-    t_var.units     = 'minutes'
+    t_var = _o.createVariable('time', 'f8', ('time',))
+    t_var.units     = 'days since 1970-01-01'
 
     # Variables
     for i in range(len(VAR_NAMES)):
@@ -373,6 +373,9 @@ def netcdf_output(args, file, kp, f107, f107a, kp_avg, swbt, swangle, swvel, swd
     _start = len(t_var[:])
     _len = len(f107)
     _output_fields = []
+
+    t_var[_start:_start+_len] = date2num([datetime.strptime(args.start_date, '%Y%m%d%H') + timedelta(minutes=i)
+                                             for i in range(_len)], t_var.units)
 
     for i in range(_len):
         _output_fields.append(_fields(i))
