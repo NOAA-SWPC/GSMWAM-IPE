@@ -1161,6 +1161,10 @@ if [ $IDEA = .true. ]; then
     $BASE_NEMS/../scripts/interpolate_input_parameters/parse_realtime.py -s $($MDATE -$((36*60)) ${FDATE}00) \
                                                                          -d $((60*(36+ 10#$FHMAX - 10#$FHINI))) \
                                                                          -p $DCOM $REALTIME_DERIVE
+  if [ $INPUT_PARAMETERS = omni ] ; then
+    $BASE_NEMS/../scripts/interpolate_input_parameters/omni_parser.py    -s $($MDATE -$((36*60)) ${FDATE}00) \
+                                                                         -d $((60*(36+ 10#$FHMAX - 10#$FHINI))) \
+                                                                         -p $PARAMETER_PATH
   elif [ $INPUT_PARAMETERS = conops2 ] ; then
     start=$($MDATE -$((36*60)) ${FDATE}00)
     duration=$((2160+15))
