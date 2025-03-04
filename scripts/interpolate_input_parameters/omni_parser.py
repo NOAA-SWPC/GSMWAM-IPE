@@ -9,7 +9,7 @@ from collections import defaultdict
 from math import exp
 import glob
 from collections import OrderedDict as od
-from netCDF4 import Dataset, date2num
+from netCDF4 import Dataset, date2num, num2date
 import traceback
 from os.path import basename
 
@@ -103,6 +103,7 @@ class InputParameters(object):
 
     def __init__(self, start_date, mins, path, outfile):
         self.start_date = start_date
+        self.steps = mins
         self.imf_date_list = [start_date + timedelta(minutes=i-SW_DATE_BACKWARDS) for i in range(mins+SW_DATE_BACKWARDS+MAX_WAIT)]
         self.f10_date_list = [start_date + timedelta(minutes=i-F10_DATE_BACKWARDS) for i in range(mins+F10_DATE_FORWARDS)]
         self.output_list = [start_date + timedelta(minutes=i) for i in range(mins)]
@@ -129,9 +130,15 @@ class InputParameters(object):
         self.hpis  = InputParameter(lambda x: hpi_from_gw(self.hps.dict[x]))
 
         self.path      = path
+
         self.omni_file = self.path + '/OMNI/imf_OMNI_{}.nc'
+
         self.gpi_file  = self.path + '/KP_AP_F107/gpi_1960001-2024156.nc'
         self.gpi_init = datetime(1960,1,1)
+
+        self.euv_file  = self.path + '/EUV/{}.nc'
+        self.euv_bins = 37
+        self.euv = np.zeros((mins, self.euv_bins))
 
         self.outfile = outfile
 
@@ -180,6 +187,30 @@ class InputParameters(object):
         self.kpa.dict = self.apa.dict.copy()
         for k,v in self.kpa.dict.items():
             self.kpa.dict[k] = self.kp_from_ap(v)
+
+    def parse_euv(self):
+        # TODO: this approach will fail if trying to create data across the year boundary
+        nc_fid = Dataset(self.euv_file.format(self.start_date.year))
+        start_idx = int((self.start_date - num2date(nc_fid.variables['time'][:], nc_fid.variables['time'].units)[0]).total_seconds() // 60)
+        end_idx = start_idx + self.steps
+
+        min_idx = 0
+        max_idx = nc_fid.variables['time'].shape[0]
+
+        if start_idx < 0:
+            if end_idx > max_idx:
+                # need to subset both sides of the assignment
+                self.euv[min_idx-start_idx:max_idx-start_idx,:] = nc_fid.variables['EUV'][:,:]
+            else:
+                # need to subset the start of the asignee
+                self.euv[min_idx-start_idx:end_idx-start_idx,:] = nc_fid.variables['EUV'][:end_idx,:]
+        else:
+            if end_idx > max_idx:
+                # need to subset the end of the asignee
+                self.euv[:max_idx-start_idx,:] = nc_fid.variables['EUV'][start_idx:,:]
+            else:
+                # entirely contained, subset both sides of the asignee
+                self.euv[:,:] = nc_fid.variables['EUV'][start_idx:end_idx,:]
 
     def parse_omni(self):
         swbz  = self.swbz.dict
@@ -304,6 +335,7 @@ class InputParameters(object):
         self.all_kp_from_ap()
 
     def parse(self):
+        self.parse_euv()
         self.parse_f107_kp()
         self.parse_omni()
         self.parse_aurora_power()
@@ -347,6 +379,7 @@ class InputParameters(object):
 
         # Dimensions
         t_dim = _o.createDimension('time',  None)
+        b_dim = _o.createDimension('euv_bins', self.euv_bins)
 
         t_var = _o.createVariable('time', 'f8', ('time',))
         t_var.units     = 'days since 1970-01-01'
@@ -369,6 +402,11 @@ class InputParameters(object):
         _output_arr = np.asarray(_output_fields)
         for i, var in enumerate(_vars):
             var[_start:_start+_len] = _output_arr[:,i]
+
+        # EUV
+        euv = _o.createVariable('EUV', 'f4', ('time', 'euv_bins',))
+        euv[_start:_start+_len,:] = self.euv
+
         _o.close()
 
 def main():
