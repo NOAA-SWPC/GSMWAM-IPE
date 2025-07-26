@@ -5,7 +5,7 @@ if [[ -e /lfs/h1 ]] ; then
     export FMID=wcoss2
     export MACHINE=wcoss2
     export BUILD_TARGET=wcoss2
-elif [[ -e /xcatpost && -e /scratch1 && -e /scratch2 ]] ; then
+elif [[ -e /xcatpost && -e /scratch3 && -e /scratch4 ]] ; then
     export FMID=hera
     export MACHINE=hera
 elif [[ -e /glade ]] ; then

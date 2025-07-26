@@ -25,7 +25,7 @@ platform hera.intel {
 
     # INPUTS is the input directory, which should contain fix and parm
     # files, plus any restarts or other inputs.
-
+    # am_2025.07.25 /scratch1/NCEPDEV/nems/emc.nemspara/RT does not exist - probably not important
     BASELINE="/scratch1/NCEPDEV/nems/emc.nemspara/RT/NEMSfv3gfs/trunk-20190925"
     BASELINE_TEMPLATE="/scratch1/NCEPDEV/nems/emc.nemspara/RT/NEMSfv3gfs/trunk-20190925"
     INPUTS="@[BASELINE]"
@@ -66,7 +66,7 @@ platform hera.intel {
         # This function is used at PARSE TIME to detect whether we are
         # on NOAA Hera.  It must be very fast and low resource usage
         # since the parser runs it.
-        if [[ -d /scratch1 && -d /scratch2 ]] ; then
+        if [[ -d /scratch3 && -d /scratch4 ]] ; then
             exit 0
         fi
         exit 1

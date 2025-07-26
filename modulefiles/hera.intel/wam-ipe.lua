@@ -5,7 +5,7 @@ help([[
 prepend_path("MODULEPATH", "/contrib/sutils/modulefiles")
 load("sutils")
 
-prepend_path("MODULEPATH", "/scratch1/NCEPDEV/nems/role.epic/spack-stack/spack-stack-1.7.0/envs/ue-intel/install/modulefiles/Core")
+prepend_path("MODULEPATH", "/contrib/spack-stack/spack-stack-1.8.0/envs/ue-intel-2021.5.0/install/modulefiles/Core")
 
 stack_intel_ver=os.getenv("stack_intel_ver") or "2021.5.0"
 load(pathJoin("stack-intel", stack_intel_ver))
@@ -31,7 +31,7 @@ load(pathJoin("sp", sp_ver))
 parallelio_ver=os.getenv("parallelio_ver") or "2.6.2"
 load(pathJoin("parallelio", parallelio_ver))
 
-esmf_ver=os.getenv("esmf_ver") or "8.6.0"
+esmf_ver=os.getenv("esmf_ver") or "8.6.1"
 load(pathJoin("esmf", esmf_ver))
 
 setenv("CC", "mpiicc")
@@ -43,7 +43,7 @@ setenv("FC", "mpiifort")
 if os.getenv("HOMEwfs") then
   prepend_path("MODULEPATH", pathJoin(os.getenv("HOMEwfs"), "modulefiles"))
 else
-  append_path("MODULEPATH", "/scratch1/NCEPDEV/swpc/Adam.Kubaryk/modulefiles")
+  append_path("MODULEPATH", "/scratch3/NCEPDEV/swpc/WAM-IPE_hera_util/modulefiles")
 end
 comio_ver=os.getenv("comio_ver") or "0.0.10_2"
 load(pathJoin("comio", comio_ver))
