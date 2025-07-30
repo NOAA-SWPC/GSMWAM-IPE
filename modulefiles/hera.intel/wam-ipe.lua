@@ -43,9 +43,10 @@ setenv("FC", "mpiifort")
 if os.getenv("HOMEwfs") then
   prepend_path("MODULEPATH", pathJoin(os.getenv("HOMEwfs"), "modulefiles"))
 else
+  append_path("MODULEPATH", "/scratch3/NCEPDEV/swpc/Adam.Kubaryk/modulefiles")
   append_path("MODULEPATH", "/scratch3/NCEPDEV/swpc/WAM-IPE_hera_util/modulefiles")
 end
-comio_ver=os.getenv("comio_ver") or "0.0.10_2"
+comio_ver=os.getenv("comio_ver") or "0.0.11_hera"
 load(pathJoin("comio", comio_ver))
 
 anaconda_ver=os.getenv("anaconda_ver") or "anaconda3-2024.02"
