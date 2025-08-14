@@ -1157,6 +1157,28 @@ if [ $IDEA = .true. ]; then
   export START_UT_SEC=$((10#$INI_HOUR*3600))
   export END_TIME=$((IPEFMAX+$START_UT_SEC))
   export MSIS_TIME_STEP=${MSIS_TIME_STEP:-900}
+
+# Check if Lmod is initialized
+if [[ -z "$LMOD_CMD" || -z "$LMOD_SETTARG_CMD" ]]; then
+    echo "Lmod environment not initialized. Please source the Lmod init script."
+    exit 1
+fi
+
+# Define a function to use Lmod in ksh
+module() {
+    eval "$($LMOD_CMD ksh $*)"
+    eval "$($LMOD_SETTARG_CMD -s ksh)"
+}
+  
+  PY_MODULES="stack-oneapi/2024.2.1 stack-intel-oneapi-mpi/2021.13 py-netcdf4/1.7.1.post2"
+  echo "save modules my_mod"
+  module save my_mod
+  module purge
+  echo "Loading new modules: $PY_MODULES"
+  for mod in $PY_MODULES; do
+       module load $mod
+  done
+  
   if [ $INPUT_PARAMETERS = realtime ] ; then
     $BASE_NEMS/../scripts/interpolate_input_parameters/parse_realtime.py -s $($MDATE -$((36*60)) ${FDATE}00) \
                                                                          -d $((60*(36+ 10#$FHMAX - 10#$FHINI))) \
@@ -1182,11 +1204,15 @@ if [ $IDEA = .true. ]; then
                                                                                        -p $PARAMETER_PATH \
                                                                                        -m $INPUT_PARAMETERS \
                                                                                        -f temp_fix $HISTORICAL_NEW_F107
+    
     rm -rf temp_fix
     if [ ! -e input_parameters.nc ] ; then
        echo "failed, no f107 file" ; exit 1
     fi
   fi
+  
+  module restore my_mod
+  
   LEN_F107=`wc -l wam_input_f107_kp.txt | cut -d' ' -f 1`
   F107_KP_SIZE=$((LEN_F107-5))
   F107_KP_DATA_SIZE=$F107_KP_SIZE
