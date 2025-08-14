@@ -1158,6 +1158,9 @@ if [ $IDEA = .true. ]; then
   export END_TIME=$((IPEFMAX+$START_UT_SEC))
   export MSIS_TIME_STEP=${MSIS_TIME_STEP:-900}
 
+# the follwoing was necessary for Hera August 2025 since pythong did not find netCDF4
+if [ -e /xcatpost ] && [ -e /scratch3 ] && [ -e /scratch4 ]; then
+
 # Check if Lmod is initialized
 if [[ -z "$LMOD_CMD" || -z "$LMOD_SETTARG_CMD" ]]; then
     echo "Lmod environment not initialized. Please source the Lmod init script."
@@ -1169,9 +1172,9 @@ module() {
     eval "$($LMOD_CMD ksh $*)"
     eval "$($LMOD_SETTARG_CMD -s ksh)"
 }
+  module use /contrib/spack-stack/spack-stack-1.9.2/envs/ue-oneapi-2024.2.1/install/modulefiles/Core
   
   PY_MODULES="stack-oneapi/2024.2.1 stack-intel-oneapi-mpi/2021.13 py-netcdf4/1.7.1.post2"
-  echo "save modules my_mod"
   module save my_mod
   module purge
   echo "Loading new modules: $PY_MODULES"
@@ -1179,6 +1182,9 @@ module() {
        module load $mod
   done
   
+fi
+# end changes for Hera  
+
   if [ $INPUT_PARAMETERS = realtime ] ; then
     $BASE_NEMS/../scripts/interpolate_input_parameters/parse_realtime.py -s $($MDATE -$((36*60)) ${FDATE}00) \
                                                                          -d $((60*(36+ 10#$FHMAX - 10#$FHINI))) \
@@ -1210,8 +1216,11 @@ module() {
        echo "failed, no f107 file" ; exit 1
     fi
   fi
-  
+
+# for Here revert back to loaded modules  
+if [ -e /xcatpost ] && [ -e /scratch3 ] && [ -e /scratch4 ]; then
   module restore my_mod
+fi
   
   LEN_F107=`wc -l wam_input_f107_kp.txt | cut -d' ' -f 1`
   F107_KP_SIZE=$((LEN_F107-5))
