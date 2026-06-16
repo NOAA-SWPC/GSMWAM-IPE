@@ -1059,21 +1059,21 @@ if [[ $IPE = .true. ]] ; then
     STEP=$((STEP+1))
   done
 fi
-if [[ $SWIO = .true. ]] ; then
-  for iomodel in $SWIO_MODELS; do
-    eval prefix=\$${iomodel}_PREFIX
-    eval cadence=\$${iomodel}_CADENCE
-    if [[ -n "$cadence" ]] ; then
-      STEPS=$(((10#$FHMAX-10#$FHINI)*60*60/cadence))
-      STEP=1
-      while [ $STEP -le $STEPS ] ; do
-        TIMESTAMP=`$MDATE $((STEP*cadence/60)) ${FDATE}00`
-        $NLN ${COMOUT}/${prefix}.${TIMESTAMP:0:8}_${TIMESTAMP:8}00.nc ${DATA}/.
-        STEP=$((STEP+1))
-      done
-    fi
-  done
-fi
+#if [[ $SWIO = .true. ]] ; then
+#  for iomodel in $SWIO_MODELS; do
+#    eval prefix=\$${iomodel}_PREFIX
+#    eval cadence=\$${iomodel}_CADENCE
+#    if [[ -n "$cadence" ]] ; then
+#      STEPS=$(((10#$FHMAX-10#$FHINI)*60*60/cadence))
+#      STEP=1
+#      while [ $STEP -le $STEPS ] ; do
+#        TIMESTAMP=`$MDATE $((STEP*cadence/60)) ${FDATE}00`
+#        $NLN ${COMOUT}/${prefix}.${TIMESTAMP:0:8}_${TIMESTAMP:8}00.nc ${DATA}/.
+#        STEP=$((STEP+1))
+#      done
+#    fi
+#  done
+#fi
 eval ln -fs $FORT1051 fort.1051
 eval ln -fs $GRDR1 GRDR1
 eval ln -fs $GRDR2 GRDR2
@@ -1082,6 +1082,8 @@ eval ln -fs $SIGR2 SIGR2
 eval ln -fs $SFCR  SFCR
 eval ln -fs $NSTR  NSTR
 eval ln -fs $RSTR  WAM_IPE_RST_wrt
+
+$NLN $COMOUT SWIO
 
 # Create Configure file (i.e. .rc file) here
 # PE$n are to be imported from outside.  If PE$n are not set from outside, the
@@ -1159,6 +1161,18 @@ if [ $IDEA = .true. ]; then
   export MSIS_TIME_STEP=${MSIS_TIME_STEP:-900}
   if [ $INPUT_PARAMETERS = realtime ] ; then
     $BASE_NEMS/../scripts/interpolate_input_parameters/parse_realtime.py -s $($MDATE -$((36*60)) ${FDATE}00) \
+                                                                         -d $((60*(36+ 10#$FHMAX - 10#$FHINI))) \
+                                                                         -p $DCOM $REALTIME_DERIVE
+  elif [ $INPUT_PARAMETERS = realtime_swips ] ; then
+    $BASE_NEMS/../scripts/interpolate_input_parameters/parse_realtime_swips.py -s $($MDATE -$((36*60)) ${FDATE}00) \
+                                                                         -d $((60*(36+ 10#$FHMAX - 10#$FHINI))) \
+                                                                         -p $DCOM $REALTIME_DERIVE
+  elif [ $INPUT_PARAMETERS = realtime_new ] ; then
+    $BASE_NEMS/../scripts/interpolate_input_parameters/parse_realtime_double.py -s $($MDATE -$((36*60)) ${FDATE}00) \
+                                                                         -d $((60*(36+ 10#$FHMAX - 10#$FHINI))) \
+                                                                         -p $DCOM $REALTIME_DERIVE
+  elif [ $INPUT_PARAMETERS = realtime_more ] ; then
+    $BASE_NEMS/../scripts/interpolate_input_parameters/parse_realtime_1.69.py -s $($MDATE -$((36*60)) ${FDATE}00) \
                                                                          -d $((60*(36+ 10#$FHMAX - 10#$FHINI))) \
                                                                          -p $DCOM $REALTIME_DERIVE
   elif [ $INPUT_PARAMETERS = conops2 ] ; then

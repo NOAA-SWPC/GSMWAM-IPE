@@ -7,67 +7,23 @@
 import_fields::
     height
     temp_neutral
-    eastward_wind_neutral
-    northward_wind_neutral
-    upward_wind_neutral
     O_Density
     O2_Density
     N2_Density
-    thermosphere_mass_density
-    thermosphere_mean_molecular_mass
+    eastward_wind_neutral
+    northward_wind_neutral
+    upward_wind_neutral
 ::
-#
-#  Output fields
-#
-#  List import fields to be written to file and set corresponding
-#  output variable name (optional) using the following syntax:
-#
-#  <import_field_name>    [<output_variable_name>]
 output_fields::
-    height                              wam_height_levels
+    height
     temp_neutral
-    eastward_wind_neutral
-    northward_wind_neutral
-    upward_wind_neutral
     O_Density
     O2_Density
     N2_Density
-    thermosphere_mass_density
-    thermosphere_mean_molecular_mass
+    eastward_wind_neutral     u_neutral
+    northward_wind_neutral    v_neutral
+    upward_wind_neutral       w_neutral
 ::
-#
-#  Imported masking field
-#
-import_mask_field: temp_neutral 0.0 -99999.
-#
-#  Computed fields
-#
-#  Use SWIO internal calculator to compute additional
-#  output fields from input ones, according to the syntax
-#  below:
-#
-#  <function_name> <input_field1> ... <input_fieldN> [<input_parm1> ... <input_parmL>] <output_field1> <output_units1> ... <output_fieldM> <output_unitsM> <scaling_factor>
-#
-#  Available functions are:
-#  - column_integrate
-#  - column_max_point
-#  - column_max_region
-#  - column_interpolate
-#
-#  Note that <scaling_factor> is optional as it may or may not be used depending on the function
-#
-compute_fields::
-    column_interpolate  thermosphere_mass_density    height    400000.    iss_mass_density    "kg m-3"
-    column_o_n2_ratio   O_Density    N2_Density    temp_neutral    height    2.e+21    o_n2_ratio    "1"
-::
-#
-# Output create mode
-#
-# Supported modes are: clobber (default), preserve-links
-# - clobber       : overwrite existing files (default)
-# - preserve-links: do not overwrite linked output targets
-#
-output_create_mode: preserve-links
 #
 # Output file format.
 #
@@ -99,7 +55,7 @@ output_datatype: float
 #   <suffix>   : determined from output format:
 #                'hd5' for hdf5, 'nc' for pnetcdf
 #
-output_file_prefix: gsm
+output_file_prefix: SWIO/wrs.t00z.wam10
 #
 # Output metadata.
 #
@@ -114,6 +70,8 @@ output_metadata::
   end_date      $SWIO_EDATE
   fcst_date     __swio_field_timestamp__
   run_type      $CDUMP
+  model         wam
+  cadence       10
 ::
 #
 # Output grid type.
@@ -145,7 +103,7 @@ output_grid_type: latlon
 #
 output_grid_size: 90 91 -150
 #
-# Minimin and maximum values of vertical coordinate (km)
+# Minimum and maximum values of vertical coordinate (km)
 # Used if #levels > 0
 #
 output_grid_level_range: 90. 1000.
@@ -154,14 +112,6 @@ output_grid_level_range: 90. 1000.
 # Used if #levels = 0
 #
 output_grid_level_values::
-   90.
-  150.
-  300.
-  400.
-  500.
-  600.
-  700.
-  800.
 ::
 #
 # If true, this flag transforms the vertical coordinate (v),

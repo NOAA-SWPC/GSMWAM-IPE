@@ -2,7 +2,7 @@
 ####  NEMS Run-Time Configuration File  #####
 #############################################
 # EARTH #
-EARTH_component_list: MED ATM IPM IIO05 IIO10 AIO05 AIO10
+EARTH_component_list: MED ATM IPM IIO05 AIO05 IIO10 AIO10 DAT
 EARTH_attributes::
   Verbosity = max
 ::
@@ -34,13 +34,6 @@ IIO05_attributes::
   ConfigFile = swio.ipe05.rc
 ::
 # IO #
-IIO10_model:                       swio
-IIO10_petlist_bounds:              $ipm_petlist_bounds
-IIO10_attributes::
-  Verbosity = max
-  ConfigFile = swio.ipe10.rc
-::
-# IO #
 AIO05_model:                       swio
 AIO05_petlist_bounds:              $atm_petlist_bounds
 AIO05_attributes::
@@ -48,11 +41,27 @@ AIO05_attributes::
   ConfigFile = swio.wam05.rc
 ::
 # IO #
+IIO10_model:                       swio
+IIO10_petlist_bounds:              $ipm_petlist_bounds
+IIO10_attributes::
+  Verbosity = max
+  ConfigFile = swio.ipe10.rc
+::
+# IO #
 AIO10_model:                       swio
 AIO10_petlist_bounds:              $atm_petlist_bounds
 AIO10_attributes::
   Verbosity = max
   ConfigFile = swio.wam10.rc
+::
+# DAT #
+DAT_model:                      datapoll
+DAT_petlist_bounds:             $dat_petlist_bounds
+DAT_attributes::
+  Verbosity = max
+  pollDir = $data_poll_dir
+  pollSec = $data_poll_interval
+  pollMax = $data_poll_max
 ::
 
 # Run Sequence #
@@ -70,6 +79,7 @@ runSeq::
       AIO05
       IPM -> IIO05
       IIO05
+      DAT
     @
     ATM -> AIO10
     AIO10

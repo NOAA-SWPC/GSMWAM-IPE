@@ -5,40 +5,35 @@
 #  Imported fields
 #
 import_fields::
-    height
-    temp_neutral
-    eastward_wind_neutral
-    northward_wind_neutral
-    upward_wind_neutral
-    O_Density
-    O2_Density
-    N2_Density
-    thermosphere_mass_density
-    thermosphere_mean_molecular_mass
+    O_plus_density
+    H_plus_density
+    He_plus_density
+    N_plus_density
+    NO_plus_density
+    O2_plus_density
+    N2_plus_density
+    ion_temperature
+    electron_temperature
+    eastward_exb_velocity
+    northward_exb_velocity
+    upward_exb_velocity
 ::
-#
-#  Output fields
-#
-#  List import fields to be written to file and set corresponding
-#  output variable name (optional) using the following syntax:
-#
-#  <import_field_name>    [<output_variable_name>]
+
 output_fields::
-    height                              wam_height_levels
-    temp_neutral
-    eastward_wind_neutral
-    northward_wind_neutral
-    upward_wind_neutral
-    O_Density
-    O2_Density
-    N2_Density
-    thermosphere_mass_density
-    thermosphere_mean_molecular_mass
+    O_plus_density
+    H_plus_density
+    He_plus_density
+    N_plus_density
+    NO_plus_density
+    O2_plus_density
+    N2_plus_density
+    ion_temperature
+    electron_temperature
+    eastward_exb_velocity
+    northward_exb_velocity
+    upward_exb_velocity
 ::
-#
-#  Imported masking field
-#
-import_mask_field: temp_neutral 0.0 -99999.
+
 #
 #  Computed fields
 #
@@ -52,22 +47,18 @@ import_mask_field: temp_neutral 0.0 -99999.
 #  - column_integrate
 #  - column_max_point
 #  - column_max_region
-#  - column_interpolate
 #
 #  Note that <scaling_factor> is optional as it may or may not be used depending on the function
 #
-compute_fields::
-    column_interpolate  thermosphere_mass_density    height    400000.    iss_mass_density    "kg m-3"
-    column_o_n2_ratio   O_Density    N2_Density    temp_neutral    height    2.e+21    o_n2_ratio    "1"
-::
-#
-# Output create mode
-#
-# Supported modes are: clobber (default), preserve-links
-# - clobber       : overwrite existing files (default)
-# - preserve-links: do not overwrite linked output targets
-#
-output_create_mode: preserve-links
+#compute_fields::
+#    column_interpolate  eastward_exb_velocity    height    300000.    u_exb_300  "m s-1"
+#    column_interpolate  northward_exb_velocity   height    300000.    v_exb_300  "m s-1"
+#    column_interpolate  upward_exb_velocity      height    300000.    w_exb_300  "m s-1"
+#    column_interpolate  eastward_exb_velocity    height    840000.    u_exb_840  "m s-1"
+#    column_interpolate  northward_exb_velocity   height    840000.    v_exb_840  "m s-1"
+#    column_interpolate  upward_exb_velocity      height    840000.    w_exb_840  "m s-1"
+#::
+
 #
 # Output file format.
 #
@@ -99,7 +90,7 @@ output_datatype: float
 #   <suffix>   : determined from output format:
 #                'hd5' for hdf5, 'nc' for pnetcdf
 #
-output_file_prefix: gsm
+output_file_prefix: SWIO/wrs.t00z.ipe10
 #
 # Output metadata.
 #
@@ -114,10 +105,12 @@ output_metadata::
   end_date      $SWIO_EDATE
   fcst_date     __swio_field_timestamp__
   run_type      $CDUMP
+  model         ipe
+  cadence       10
 ::
 #
 # Output grid type.
-#
+# 
 # Supported types are:
 # - latlon: 2D/3D regular lat/lon spherical grid
 # - none  : native (imported) grid/mesh
@@ -131,19 +124,17 @@ output_grid_type: latlon
 #
 # Provides the lat/lon grid resolution as
 #   #longitudes #latitudes [#levels]
-#
 # If #levels is missing, a 2D lat/lon grid will be built
 #
 # If #levels > 0, the minimum and maximum value of the
-# vertical coordinate (km) will be read via the
+# vertical coordinate (km) will be read via the 
 # 'output_grid_level_range' keyword below.
 #
-# If #levels = 0, the grid's vertical levels are read
+# IF #levels <=0, the grid's vertical levels are read
 # from the 'output_grid_level_values' table (km)
 #
-# If #levels < 0, ungridded #nlevels will be added
-#
-output_grid_size: 90 91 -150
+#output_grid_size: 90 91 183
+output_grid_size: 90 91 0
 #
 # Minimin and maximum values of vertical coordinate (km)
 # Used if #levels > 0
@@ -151,17 +142,67 @@ output_grid_size: 90 91 -150
 output_grid_level_range: 90. 1000.
 #
 # List of vertical levels (km)
-# Used if #levels = 0
+# Used if #levels <= 0
 #
 output_grid_level_values::
-   90.
-  150.
-  300.
-  400.
-  500.
-  600.
-  700.
-  800.
+90.
+95.
+100.
+105.
+111.
+116.
+122.
+129.
+136.
+143.
+150.
+158.
+167.
+175.
+185.
+194.
+204.
+215.
+227.
+238.
+251.
+264.
+278.
+293.
+308.
+324.
+341.
+359.
+378.
+398.
+419.
+441.
+464.
+489.
+515.
+542.
+570.
+600.
+632.
+665.
+700.
+737.
+776.
+816.
+859.
+905.
+952.
+1002.
+1055.
+1169.
+1295.
+1435.
+1590.
+1762.
+1952.
+2163.
+2397.
+2655.
 ::
 #
 # If true, this flag transforms the vertical coordinate (v),

@@ -28,11 +28,11 @@ IPM_attributes::
 ::
 # Run Sequence #
 runSeq::
-  @$coupling_interval_slow_sec
+  @${DELTIM_IPE}.0
     ATM -> MED :remapMethod=redist
     MED
     MED -> IPM :remapMethod=redist
-    @$coupling_interval_fast_sec
+    @${DELTIM}.0
       ATM
     @
     IPM
